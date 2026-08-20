@@ -1,0 +1,50 @@
+# ==============================================================================
+# CivicLens - Intelligent Government Budget Transparency Platform
+# Backend, RAG, Agentic AI & Data Ingestion Dependencies
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Core API Framework & Server
+# ------------------------------------------------------------------------------
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+python-multipart>=0.0.9      # For PDF and CSV multipart file uploads
+
+# ------------------------------------------------------------------------------
+# 2. Google Gemini & Embedding Models (LLM + Gemini Embedding 2)
+# ------------------------------------------------------------------------------
+google-genai>=0.1.0          # Google official GenAI SDK for Gemini 3.5/2.0
+google-generativeai>=0.8.0   # Python SDK for Google Generative AI
+langchain-google-genai>=2.0.0 # LangChain integration for Gemini & embeddings
+
+# ------------------------------------------------------------------------------
+# 3. Agentic AI & Orchestration (LangChain & State Workflows)
+# ------------------------------------------------------------------------------
+langchain>=0.3.0             # Core agent abstractions and tool interfaces
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+
+# ------------------------------------------------------------------------------
+# 4. Database, Vector Store & RAG Storage (Supabase + pgvector)
+# ------------------------------------------------------------------------------
+supabase>=2.8.0              # Supabase Python client (Auth, Storage, Postgres)
+psycopg2-binary>=2.9.9       # PostgreSQL driver
+pgvector>=0.3.2              # Vector similarity operations for Postgres RAG
+sqlalchemy>=2.0.32           # Relational ORM for budget records & anomalies
+
+# ------------------------------------------------------------------------------
+# 5. Document Processing & Ingestion (PDF extraction, Chunking, Cleaners)
+# ------------------------------------------------------------------------------
+pymupdf>=1.24.9              # PyMuPDF (fitz) - High-speed PDF text & page extraction
+pypdf>=4.3.1                 # Standard PDF processing fallback
+pandas>=2.2.2                # CSV budget dataset manipulation and aggregation
+numpy>=1.26.4                # Statistical calculations & anomaly math
+
+# ------------------------------------------------------------------------------
+# 6. Utilities & Environment Configuration
+# ------------------------------------------------------------------------------
+python-dotenv>=1.0.1         # Load GEMINI_API_KEY, SUPABASE_URL from .env
+httpx>=0.27.0                # Async HTTP client
+tqdm>=4.66.5                 # Progress bars for batch embedding & ingestion
