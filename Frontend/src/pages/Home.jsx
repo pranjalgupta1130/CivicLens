@@ -4,70 +4,66 @@ import {
   Sparkles, 
   ArrowRight, 
   ShieldAlert, 
-  PieChart, 
-  Bot, 
-  UploadCloud, 
+  Building2, 
   CheckCircle2, 
-  TrendingUp,
-  Search,
-  Eye,
-  Zap,
-  Building2,
-  HeartPulse,
-  Route,
-  Sprout,
-  Check
+  TrendingUp, 
+  Route, 
+  Check 
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
-import { civicKPIs, aiAlertsData, budgetHighlights } from '../data/mockData';
+import MyDistrictSection from '../components/MyDistrictSection';
+import GeographicMap from '../components/GeographicMap';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { aiAlertsData, budgetHighlights } from '../data/mockData';
 
 export default function Home() {
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
   const activeAlerts = aiAlertsData.filter(a => a.status === 'Active');
 
   return (
-    <div className="space-y-12 pb-10">
+    <div className="space-y-10 pb-12">
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl glass-panel p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-[#0b0f19]">
-        
-        {/* Decorative Glow Orbs */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 backdrop-blur-md">
-            <Zap className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />
-            <span>Civic Lens Engine v2.4 Active • Real-Time Fiscal Audit</span>
+      {/* Government Portal Light Hero Header */}
+      <section className="rounded-3xl p-8 sm:p-12 border border-slate-200 bg-gradient-to-r from-white via-blue-50 to-emerald-50 text-slate-900 shadow-sm relative overflow-hidden">
+        <div className="max-w-3xl space-y-6 relative z-10">
+          
+          {/* Government Portal Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border bg-white/90 text-blue-900 border-blue-200 shadow-xs">
+            <span>🇮🇳 {t.heroTag}</span>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
-            Transparent Civic Governance powered by <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-violet-400">AI Intelligence</span>
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-slate-900">
+            {t.heroTitle}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-            Democratizing public budget data for citizens, journalists, auditors, and policy analysts. Explore sector outlays, track scheme expenditures, and spot anomalies with automated AI ledger audits.
+          <p className="text-sm sm:text-base text-slate-700 leading-relaxed max-w-2xl font-medium">
+            {t.heroSubtitle}
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <Link
               to="/dashboard"
-              className="px-6 py-3.5 rounded-2xl text-sm font-semibold bg-gradient-to-r from-cyan-500 to-indigo-600 text-white hover:from-cyan-400 hover:to-indigo-500 shadow-xl shadow-cyan-500/25 flex items-center gap-2 transition-all hover:scale-105"
+              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]"
             >
-              <span>Open Dashboard</span>
+              <span>{t.navDashboard}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
             <Link
               to="/ai-assistant"
-              className="px-6 py-3.5 rounded-2xl text-sm font-semibold glass-panel text-slate-200 hover:text-white hover:bg-slate-800/80 border border-slate-700 flex items-center gap-2 transition-all"
+              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm flex items-center gap-2 transition-all"
             >
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span>Ask AI Assistant</span>
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span>{t.navAiAssistant}</span>
             </Link>
           </div>
         </div>
       </section>
 
+<<<<<<< HEAD
       {/* CivicLens USP Central Product Story Banner */}
       <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -101,68 +97,85 @@ export default function Home() {
       </section>
 
       {/* KPI Stats Grid - Top Sector Budget Metrics */}
+=======
+      {/* Main Budget Summary Statistics Grid */}
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
       <section className="space-y-4">
 
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold font-display text-white">Government Sector Allocations FY 2026</h2>
-          <span className="text-xs text-slate-400">Synced with CAG Portal</span>
+          <h2 className="text-xl font-bold font-display">{t.heroTag} Summary FY 2026</h2>
+          <span className="text-xs text-slate-500 dark:text-slate-400">CAG Verified Public Record</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
-            title="Education Budget"
-            value={civicKPIs.educationBudget}
-            change="↑ 12%"
+            title={t.totalBudget}
+            value={t.totalBudgetVal}
+            change={t.spentMoreThisYear}
             changeType="increase"
             icon={Building2}
-            description="26% of Total Allocation"
+            description="FY 2026 Total Public Allocation"
+            topicKey="Total Budget"
           />
           <StatCard
-            title="Healthcare Budget"
-            value={civicKPIs.healthcareBudget}
-            change="↑ 18%"
+            title={t.moneySpent}
+            value={t.moneySpentVal}
+            change="69% Used So Far"
             changeType="increase"
-            icon={HeartPulse}
-            description="23% of Total Allocation"
+            icon={CheckCircle2}
+            description="Actual Disbursed Money"
+            topicKey="Money Spent"
           />
           <StatCard
-            title="Roads & Highways"
-            value={civicKPIs.roadsBudget}
-            change="↑ 8%"
-            changeType="increase"
-            icon={Route}
-            description="17% of Total Allocation"
-          />
-          <StatCard
-            title="Agriculture Budget"
-            value={civicKPIs.agricultureBudget}
-            change="↓ 4%"
+            title={t.moneyRemaining}
+            value={t.moneyRemainingVal}
+            change="31% Available"
             changeType="decrease"
-            icon={Sprout}
-            description="12% of Total Allocation"
+            icon={Route}
+            description="Unspent Balance Available"
+            topicKey="Money Remaining"
+          />
+          <StatCard
+            title={t.budgetUsed}
+            value={t.budgetUsedVal}
+            change="+8% vs Last Quarter"
+            changeType="increase"
+            icon={TrendingUp}
+            description="Overall Utilization Percentage"
+            topicKey="Budget Used"
           />
         </div>
       </section>
 
-      {/* FY 2026 Budget Highlights Section */}
-      <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-800 bg-gradient-to-r from-slate-900/90 via-[#111827] to-slate-900/90">
+      {/* 📍 Prominent MY AREA / MY DISTRICT Section */}
+      <MyDistrictSection />
+
+      {/* 🟢 Geographic District Risk & Budget Map */}
+      <GeographicMap />
+
+      {/* Budget Highlights */}
+      <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm ${
+        isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+      }`}>
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+          <div className="p-3 rounded-2xl bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 border border-blue-200 dark:border-slate-700">
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold font-display text-white">FY 2026 Budget Highlights</h3>
-            <p className="text-xs text-slate-400">Major policy achievements and public infrastructure commitments</p>
+            <h3 className="text-xl font-bold font-display">FY 2026 Budget Achievements</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Major public infrastructure commitments completed this year</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {budgetHighlights.map((highlight, idx) => (
-            <div key={idx} className="glass-card rounded-2xl p-4 border border-slate-800 flex items-start gap-3 hover:border-cyan-500/30 transition-all">
-              <div className="p-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mt-0.5">
+            <div key={idx} className={`rounded-2xl p-4 border flex items-start gap-3 ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mt-0.5">
                 <Check className="w-4 h-4" />
               </div>
-              <span className="text-xs sm:text-sm font-medium text-slate-200 leading-relaxed">
+              <span className="text-xs sm:text-sm font-medium leading-relaxed">
                 {highlight}
               </span>
             </div>
@@ -170,101 +183,48 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Live Anomaly Feed Highlight */}
-      <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-800 bg-gradient-to-r from-slate-900 via-[#101726] to-slate-900">
+      {/* Live Unusual Spending Flags Section */}
+      <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm ${
+        isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+      }`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400">
+            <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
               <ShieldAlert className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-lg font-bold font-display text-white">Live AI Anomaly & Risk Alerts</h3>
-              <p className="text-xs text-slate-400">Real-time flags generated by public ledger auditing models</p>
+              <h3 className="text-lg font-bold font-display">{t.unusualSpendingFound}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Public spending flags automatically audited by CivicLens AI</p>
             </div>
           </div>
           <Link
             to="/ai-alerts"
-            className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5"
+            className="text-xs font-bold text-blue-700 dark:text-cyan-400 hover:underline flex items-center gap-1"
           >
-            <span>View All {activeAlerts.length} Active Alerts</span>
+            <span>View All {activeAlerts.length} Active Flags</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activeAlerts.slice(0, 2).map((alert) => (
-            <div key={alert.id} className="glass-card rounded-2xl p-5 border border-rose-900/40 bg-rose-950/10 hover:border-rose-700/60 transition-all">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                  {alert.severity} • Risk Score: {alert.score}
+            <div key={alert.id} className={`rounded-2xl p-5 border flex flex-col justify-between space-y-3 ${
+              isDark ? 'bg-slate-950 border-rose-900/40' : 'bg-rose-50/50 border-rose-200'
+            }`}>
+              <div className="flex items-center justify-between text-xs">
+                <span className="px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] bg-rose-500/20 text-rose-700 dark:text-rose-300">
+                  {alert.severity} Flag
                 </span>
-                <span className="text-xs text-slate-400 font-mono">{alert.id}</span>
+                <span className="font-mono text-slate-400">{alert.id}</span>
               </div>
-              <h4 className="font-semibold text-slate-100 text-sm mb-1">{alert.title}</h4>
-              <p className="text-xs text-slate-400 mb-3">{alert.description}</p>
-              <div className="flex items-center justify-between text-xs border-t border-slate-800/80 pt-2.5">
-                <span className="text-cyan-400 font-medium">{alert.department}</span>
-                <Link to="/ai-alerts" className="text-slate-300 hover:text-white underline text-[11px]">Inspect Details</Link>
+              <h4 className="font-bold text-sm">{alert.title}</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{alert.description}</p>
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-slate-800">
+                <span className="font-semibold text-blue-700 dark:text-cyan-400">{alert.department}</span>
+                <Link to="/ai-alerts" className="text-slate-600 dark:text-slate-300 hover:underline">{t.inspectDetails}</Link>
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Platform Pillars */}
-      <section className="space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl font-bold font-display text-white">Public Governance Tools</h2>
-          <p className="text-sm text-slate-400">Everything citizens, auditors, and policy analysts need to inspect public spending.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          <div className="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-800 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center">
-                <PieChart className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-white font-display">Line-Item Budget Explorer</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Filter by department schemes, inspect awarded contractor tenders, and view budget versus spending line-items.
-              </p>
-            </div>
-            <Link to="/budget-explorer" className="mt-6 inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300">
-              Explore Budgets &rarr;
-            </Link>
-          </div>
-
-          <div className="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-800 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                <Bot className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-white font-display">Conversational AI Assistant</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Query government financial databases in plain English. Get instant sector breakdowns, scheme answers, and policy comparisons.
-              </p>
-            </div>
-            <Link to="/ai-assistant" className="mt-6 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300">
-              Launch AI Chat &rarr;
-            </Link>
-          </div>
-
-          <div className="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-800 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <UploadCloud className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-white font-display">Admin Data Ingestion</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Upload government expenditure records, department allocation CSVs, and trigger automated AI risk validation.
-              </p>
-            </div>
-            <Link to="/admin-upload" className="mt-6 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300">
-              Upload Datasets &rarr;
-            </Link>
-          </div>
-
         </div>
       </section>
 

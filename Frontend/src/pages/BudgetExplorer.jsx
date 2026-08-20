@@ -2,24 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Search, 
-  Filter, 
   Download, 
-  ExternalLink, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
-  Building2, 
-  X,
-  Layers,
-  FileText
+  FileText, 
+  X, 
+  HelpCircle,
+  CheckCircle2
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+<<<<<<< HEAD
 import { detailedBudgets, departmentBudgets as mockDeptBudgets } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function BudgetExplorer() {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
+=======
+import WhyExplanationModal from '../components/WhyExplanationModal';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { detailedBudgets, departmentBudgets } from '../data/mockData';
+
+export default function BudgetExplorer() {
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
+  const [searchParams] = useSearchParams();
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
   const initialQuery = searchParams.get('search') || '';
 
 
@@ -27,6 +35,7 @@ export default function BudgetExplorer() {
   const [selectedDept, setSelectedDept] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedBudgetItem, setSelectedBudgetItem] = useState(null);
+  const [whyTopic, setWhyTopic] = useState(null);
 
   // Live Backend Data States
   const [budgets, setBudgets] = useState([]);
@@ -172,6 +181,7 @@ export default function BudgetExplorer() {
     return matchesSearch && matchesDept && matchesStatus;
   });
 
+<<<<<<< HEAD
   const chartData = filteredItems.slice(0, 10).map(item => {
     const rawAlloc = item.budget_amount !== undefined ? item.budget_amount : item.allocated;
     const rawSpent = item.actual_amount !== undefined ? item.actual_amount : item.spent;
@@ -185,6 +195,13 @@ export default function BudgetExplorer() {
       Spent: spentCr
     };
   });
+=======
+  const chartData = filteredItems.map(item => ({
+    name: item.title.length > 18 ? item.title.substring(0, 18) + '...' : item.title,
+    Allocated: item.allocated / 10000000,
+    Spent: item.spent / 10000000
+  }));
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
   const formatCurrency = (val) => {
     if (val === undefined || val === null) return '₹0 Cr';
@@ -224,28 +241,29 @@ export default function BudgetExplorer() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
-            Line-Item Budget Explorer
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
+            {t.navBudgetExplorer}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Audit capital schemes, government contractor tenders, and spending line-items.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Search public government schemes, contractor projects, and line-item allocations.
           </p>
         </div>
 
         <button
           onClick={handleExportCSV}
-          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all"
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-colors"
         >
           <Download className="w-4 h-4" />
-          <span>Export Filtered CSV</span>
+          <span>{t.downloadSectorData}</span>
         </button>
       </div>
 
-      {/* Filter Controls Bar */}
-      <div className="glass-panel rounded-2xl p-4 border border-slate-800 space-y-3">
+      {/* Filter Bar */}
+      <div className={`rounded-2xl p-4 border shadow-sm space-y-3 ${
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+      }`}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           
-          {/* Search Input */}
           <div className="md:col-span-2 relative">
             <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
             <input
@@ -253,21 +271,26 @@ export default function BudgetExplorer() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search schemes, vendors, project names..."
-              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              className={`w-full pl-9 pr-8 py-2 text-xs rounded-xl border focus:outline-none ${
+                isDark
+                  ? 'bg-slate-950 border-slate-700 text-slate-100 placeholder-slate-500'
+                  : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
+              }`}
             />
             {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-2.5 text-slate-400 hover:text-white">
+              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
                 <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Department Filter */}
-          <div className="relative">
+          <div>
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className="w-full py-2 px-3 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+              className={`w-full py-2 px-3 text-xs rounded-xl border font-medium cursor-pointer ${
+                isDark ? 'bg-slate-950 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-300 text-slate-800'
+              }`}
             >
               <option value="All">All Departments</option>
               {availableDepartments.map(d => (
@@ -276,23 +299,29 @@ export default function BudgetExplorer() {
             </select>
           </div>
 
-          {/* Status Filter */}
-          <div className="relative">
+          <div>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full py-2 px-3 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+              className={`w-full py-2 px-3 text-xs rounded-xl border font-medium cursor-pointer ${
+                isDark ? 'bg-slate-950 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-300 text-slate-800'
+              }`}
             >
               <option value="All">All Execution Statuses</option>
               <option value="On Track">On Track</option>
               <option value="Over Budget">Over Budget</option>
+<<<<<<< HEAD
               <option value="Under Budget">Under Budget</option>
+=======
+              <option value="Completed">Completed</option>
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
             </select>
           </div>
 
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Loading State */}
       {isLoading && (
         <div className="glass-panel rounded-3xl p-12 text-center text-slate-400 space-y-3 border border-slate-800">
@@ -315,9 +344,105 @@ export default function BudgetExplorer() {
           >
             Retry Loading Budgets
           </button>
+=======
+      {/* Filtered Bar Chart Preview */}
+      {filteredItems.length > 0 && (
+        <div className={`rounded-3xl p-6 border shadow-sm ${
+          isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold font-display">{t.chartWhichSectorMost}</h3>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Showing {filteredItems.length} schemes</span>
+          </div>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f293d" : "#e2e8f0"} vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} angle={-15} textAnchor="end" />
+                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
+                <Tooltip formatter={(val) => `₹${val} Cr`} />
+                <Bar dataKey="Allocated" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Spent" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
 
+      {/* Budget Table */}
+      <div className={`rounded-3xl p-6 border shadow-sm space-y-4 ${
+        isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+      }`}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className={`uppercase text-[10px] font-bold tracking-wider border-b ${
+              isDark ? 'bg-slate-950 text-slate-400 border-slate-800' : 'bg-slate-50 text-slate-600 border-slate-200'
+            }`}>
+              <tr>
+                <th className="px-4 py-3">Scheme Title & ID</th>
+                <th className="px-4 py-3">Department</th>
+                <th className="px-4 py-3">Vendor / Contractor</th>
+                <th className="px-4 py-3">Money Allocated</th>
+                <th className="px-4 py-3">Money Spent</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-center">Unusual Flag</th>
+                <th className="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+              {filteredItems.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <td className="px-4 py-3.5">
+                    <div className="font-bold">{item.title}</div>
+                    <div className="text-[10px] text-slate-400 font-mono">{item.id} • {item.category}</div>
+                  </td>
+                  <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300">{item.department}</td>
+                  <td className="px-4 py-3.5 text-blue-600 dark:text-cyan-400 font-bold">{item.vendor}</td>
+                  <td className="px-4 py-3.5 font-bold">{formatCurrency(item.allocated)}</td>
+                  <td className="px-4 py-3.5 font-bold text-blue-600 dark:text-cyan-400">{formatCurrency(item.spent)}</td>
+                  <td className="px-4 py-3.5">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                      item.status.includes('Over')
+                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200'
+                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200'
+                    }`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-center">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      item.anomalyRisk === 'High'
+                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
+                        : item.anomalyRisk === 'Medium'
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                    }`}>
+                      {item.anomalyRisk} Risk
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 text-right flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setWhyTopic(item.department)}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 border border-blue-200 dark:border-slate-700"
+                    >
+                      {t.whyBtn}
+                    </button>
+                    <button
+                      onClick={() => setSelectedBudgetItem(item)}
+                      className="px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-white dark:bg-slate-700"
+                    >
+                      {t.inspectDetails}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
+        </div>
+      )}
+
+<<<<<<< HEAD
       {/* Main Content Area */}
       {!isLoading && (!error || isUsingFallback) && (
         <>
@@ -441,18 +566,32 @@ export default function BudgetExplorer() {
             
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+=======
+      {/* Scheme Detail Dossier Modal */}
+      {selectedBudgetItem && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className={`w-full max-w-xl rounded-3xl p-6 shadow-2xl border transition-all animate-in fade-in zoom-in-95 ${
+            isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-cyan-400" />
-                <span className="font-display font-bold text-lg text-white">Government Scheme Ledger Dossier</span>
+                <FileText className="w-5 h-5 text-blue-600 dark:text-cyan-400" />
+                <h3 className="font-bold text-base font-display">Government Scheme Public Record</h3>
               </div>
+<<<<<<< HEAD
               <button
                 onClick={() => { setSelectedBudgetItem(null); setDossierData(null); }}
                 className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
               >
+=======
+              <button onClick={() => setSelectedBudgetItem(null)} className="p-1 text-slate-400 hover:text-slate-600">
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
                 <X className="w-5 h-5" />
               </button>
             </div>
 
+<<<<<<< HEAD
             {/* Scheme Title Header */}
             <div>
               <div className="flex items-center gap-2">
@@ -609,8 +748,41 @@ export default function BudgetExplorer() {
               <button
                 onClick={() => { setSelectedBudgetItem(null); setDossierData(null); }}
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300"
+=======
+            <div className="py-4 space-y-4 text-xs">
+              <div>
+                <span className="text-[10px] font-semibold uppercase text-slate-400">Scheme Name</span>
+                <h4 className="text-base font-bold">{selectedBudgetItem.title}</h4>
+                <p className="text-slate-400 font-mono">{selectedBudgetItem.id} • Category: {selectedBudgetItem.category}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <div>
+                  <span className="text-slate-500">Department:</span>
+                  <p className="font-bold mt-0.5">{selectedBudgetItem.department}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Awarded Contractor:</span>
+                  <p className="font-bold text-blue-600 dark:text-cyan-400 mt-0.5">{selectedBudgetItem.vendor}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Total Outlay Allocated:</span>
+                  <p className="font-mono font-bold text-sm mt-0.5">{formatCurrency(selectedBudgetItem.allocated)}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Money Already Spent:</span>
+                  <p className="font-mono font-bold text-blue-600 dark:text-cyan-400 text-sm mt-0.5">{formatCurrency(selectedBudgetItem.spent)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+              <button
+                onClick={() => setSelectedBudgetItem(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
               >
-                Close Dossier
+                {t.closeBtn}
               </button>
             </div>
 
@@ -618,6 +790,14 @@ export default function BudgetExplorer() {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      <WhyExplanationModal
+        isOpen={!!whyTopic}
+        onClose={() => setWhyTopic(null)}
+        topicKey={whyTopic}
+      />
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
     </div>
   );

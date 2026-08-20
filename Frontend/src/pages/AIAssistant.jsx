@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { 
   Bot, 
   User, 
@@ -7,6 +8,7 @@ import {
   Trash2, 
   Copy, 
   Check, 
+<<<<<<< HEAD
   CornerDownLeft, 
   ExternalLink,
   ShieldCheck,
@@ -21,35 +23,77 @@ import { useLanguage } from '../context/LanguageContext';
 
 export default function AIAssistant() {
   const { selectedLang, setSelectedLang, currentLangConfig, SUPPORTED_LANGUAGES, t } = useLanguage();
+=======
+  Mic, 
+  HelpCircle,
+  Database,
+  ExternalLink
+} from 'lucide-react';
+import VoiceInputModal from '../components/VoiceInputModal';
+import WhyExplanationModal from '../components/WhyExplanationModal';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { ragService } from '../services/ragService';
+
+export default function AIAssistant() {
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
+  const [searchParams] = useSearchParams();
+  const initialUrlQuery = searchParams.get('q') || '';
+
+  const sampleCitizenPrompts = [
+    "How much money was given to education?",
+    "Why did healthcare spending increase?",
+    "Which sector got the most money?",
+    "How much was spent on roads?",
+    "Show me Maharashtra's budget.",
+    "Compare education spending with last year."
+  ];
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
       sender: 'ai',
+<<<<<<< HEAD
       text: "Hello! I am your **CivicLens Multilingual AI Assistant**. Select your language above or speak via microphone to query public budget ledgers.",
       sources: ["CAG Open Budget Portal", "Ministry Ledgers"],
+=======
+      text: "Hello citizen! I am your Public Budget AI Assistant. Ask me any question in simple language about government spending across education, healthcare, roads, or district budgets.",
+      sources: ["Government Budget Data"],
+      topicKey: "default",
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
 
   const [isTyping, setIsTyping] = useState(false);
+<<<<<<< HEAD
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   
+=======
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [whyTopic, setWhyTopic] = useState(null);
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
   const chatEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    if (initialUrlQuery) {
+      handleSendMessage(initialUrlQuery);
+    }
+  }, [initialUrlQuery]);
 
   useEffect(() => {
-    scrollToBottom();
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+<<<<<<< HEAD
   const handleToggleVoice = () => {
     setSpeechError(null);
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -99,6 +143,46 @@ export default function AIAssistant() {
 
       recognition.onend = () => {
         setIsListening(false);
+=======
+  const generateSimpleAnswer = (query) => {
+    const q = query.toLowerCase();
+
+    if (q.includes('healthcare') || q.includes('health')) {
+      return {
+        text: "Healthcare spending increased by ₹840 Cr this year. A major reason was additional funding for district hospital construction and emergency medical equipment across 12 districts.",
+        sources: ["Government Budget Data - Health Ministry"],
+        topicKey: "healthcare"
+      };
+    } else if (q.includes('education') || q.includes('school')) {
+      return {
+        text: "Government allocated ₹3,240 Cr to education this year (26% of total public budget). ₹2,680 Cr has already been spent on modernizing 250 schools and digital labs.",
+        sources: ["Government Budget Data - Education Outlay"],
+        topicKey: "education"
+      };
+    } else if (q.includes('most money') || q.includes('highest')) {
+      return {
+        text: "Education received the most money (₹3,240 Cr), followed by Healthcare (₹2,850 Cr), Roads & Highways (₹2,100 Cr), and Agriculture (₹1,450 Cr).",
+        sources: ["Government Budget Data - Sector Ranking"],
+        topicKey: "education"
+      };
+    } else if (q.includes('road') || q.includes('highway')) {
+      return {
+        text: "₹2,100 Cr was allocated to roads and expressways. ₹1,890 Cr has already been spent on 84 approved road infrastructure projects.",
+        sources: ["Government Budget Data - Public Works Dept"],
+        topicKey: "roads"
+      };
+    } else if (q.includes('maharashtra') || q.includes('pune')) {
+      return {
+        text: "Maharashtra's Pune district received ₹2,430 Cr in total allocation. ₹2,201 Cr has been spent so far (91% used), and ₹229 Cr remains available for district projects.",
+        sources: ["State Spatial Budget Mapping"],
+        topicKey: "default"
+      };
+    } else {
+      return {
+        text: `Based on official government budget records for "${query}": Total public allocation is ₹14,290 Cr. ₹9,840 Cr (69%) has been spent so far across all public services.`,
+        sources: ["Government Budget Data"],
+        topicKey: "default"
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
       };
 
       recognitionRef.current = recognition;
@@ -125,6 +209,7 @@ export default function AIAssistant() {
     if (!textToSend) setInputQuery('');
     setIsTyping(true);
 
+<<<<<<< HEAD
     try {
       const response = await fetch('/api/assistant', {
         method: 'POST',
@@ -157,6 +242,16 @@ export default function AIAssistant() {
         sources: displaySources,
         confidence: data.confidence,
         status: data.status,
+=======
+    setTimeout(() => {
+      const res = generateSimpleAnswer(text);
+      const aiMsg = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: res.text,
+        sources: res.sources,
+        topicKey: res.topicKey,
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiMsg]);
@@ -174,6 +269,7 @@ export default function AIAssistant() {
       setMessages(prev => [...prev, aiMsg]);
     } finally {
       setIsTyping(false);
+<<<<<<< HEAD
     }
   };
 
@@ -193,6 +289,9 @@ export default function AIAssistant() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
+=======
+    }, 600);
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
   };
 
   return (
@@ -201,6 +300,7 @@ export default function AIAssistant() {
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+<<<<<<< HEAD
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
               Civic AI Assistant
@@ -260,13 +360,40 @@ export default function AIAssistant() {
       <div className="space-y-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Quick Prompts ({currentLangConfig.name})
+=======
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
+            {t.aiTitle}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            {t.aiSubtitle}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setVoiceModalOpen(true)}
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all"
+        >
+          <Mic className="w-4 h-4 animate-pulse" />
+          <span>{t.askVoice}</span>
+        </button>
+      </div>
+
+      {/* Recommended Citizen Prompts */}
+      <div className="space-y-2">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          {t.sampleQuestionsTitle}
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
         </span>
         <div className="flex flex-wrap gap-2">
-          {samplePrompts.map((prompt, idx) => (
+          {sampleCitizenPrompts.map((prompt, idx) => (
             <button
               key={idx}
               onClick={() => handleSendMessage(prompt)}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 border border-slate-800 transition-all hover:scale-[1.02] text-left"
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all text-left ${
+                isDark
+                  ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-cyan-400 hover:border-slate-700'
+                  : 'bg-white border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 shadow-sm'
+              }`}
             >
               "{prompt}"
             </button>
@@ -274,10 +401,12 @@ export default function AIAssistant() {
         </div>
       </div>
 
-      {/* Main Chat Window Container */}
-      <div className="glass-panel rounded-3xl border border-slate-800 flex flex-col h-[520px] shadow-2xl overflow-hidden">
+      {/* Main Chat Container */}
+      <div className={`rounded-3xl border shadow-xl flex flex-col h-[520px] overflow-hidden ${
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+      }`}>
         
-        {/* Messages Feed */}
+        {/* Feed */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {messages.map((msg) => {
             const isAI = msg.sender === 'ai';
@@ -287,36 +416,35 @@ export default function AIAssistant() {
                 className={`flex gap-3 ${isAI ? 'justify-start' : 'justify-end'} animate-in fade-in`}
               >
                 {isAI && (
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white flex-shrink-0 mt-1 shadow-md shadow-cyan-500/20">
+                  <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 mt-1 shadow-md">
                     <Bot className="w-4 h-4" />
                   </div>
                 )}
 
                 <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs space-y-2 ${
                   isAI
-                    ? 'bg-slate-900/90 border border-slate-800 text-slate-200'
-                    : 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white font-medium shadow-md shadow-cyan-500/10'
+                    ? isDark
+                      ? 'bg-slate-950 border border-slate-800 text-slate-200'
+                      : 'bg-slate-50 border border-slate-200 text-slate-900'
+                    : 'bg-blue-600 text-white font-semibold shadow-md'
                 }`}>
-                  <div className="flex items-center justify-between gap-4 text-[10px] opacity-70 pb-1 border-b border-white/10">
-                    <span className="font-semibold">{isAI ? 'CivicLens AI' : 'You'}</span>
+                  <div className="flex items-center justify-between gap-4 text-[10px] opacity-70 pb-1 border-b border-current/10">
+                    <span className="font-bold">{isAI ? 'CivicLens AI' : 'You'}</span>
                     <span>{msg.timestamp}</span>
                   </div>
 
-                  <div className="whitespace-pre-line leading-relaxed">
+                  <div className="whitespace-pre-line leading-relaxed text-xs sm:text-sm">
                     {msg.text}
                   </div>
 
-                  {msg.sources && (
-                    <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center gap-1.5 text-[10px]">
-                      <span className="text-slate-400 font-semibold">Verified Sources:</span>
-                      {msg.sources.map((src, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono">
-                          {src}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {isAI && msg.sources && (
+                    <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                      <span className="font-semibold text-slate-500 flex items-center gap-1">
+                        <Database className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />
+                        {t.sourceGovtData}
+                      </span>
 
+<<<<<<< HEAD
                   {isAI && (
                     <div className="flex items-center justify-between pt-1 text-[10px] text-slate-400">
                       {msg.confidence !== undefined && msg.confidence !== null && (
@@ -340,13 +468,29 @@ export default function AIAssistant() {
                       >
                         {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
+=======
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setWhyTopic(msg.topicKey || "default")}
+                          className="px-2 py-0.5 rounded bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 font-bold border border-blue-200 dark:border-slate-700"
+                        >
+                          {t.whyThisAnswer}
+                        </button>
+                        <Link
+                          to="/budget-explorer"
+                          className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:underline"
+                        >
+                          {t.viewBudgetData}
+                        </Link>
+                      </div>
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
                     </div>
                   )}
 
                 </div>
 
                 {!isAI && (
-                  <div className="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 flex-shrink-0 mt-1">
+                  <div className="w-8 h-8 rounded-xl bg-slate-800 text-cyan-400 flex items-center justify-center flex-shrink-0 mt-1">
                     <User className="w-4 h-4" />
                   </div>
                 )}
@@ -356,12 +500,19 @@ export default function AIAssistant() {
 
           {isTyping && (
             <div className="flex gap-3 justify-start items-center">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white flex-shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 animate-spin" />
               </div>
+<<<<<<< HEAD
               <div className="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 text-xs text-slate-400 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                 <span>Auditing sector ledgers in {currentLangConfig.name}...</span>
+=======
+              <div className={`rounded-2xl px-4 py-3 text-xs text-slate-500 border ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <span>Fetching official government budget explanation...</span>
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
               </div>
             </div>
           )}
@@ -369,10 +520,12 @@ export default function AIAssistant() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input Bar */}
+        {/* Input bar */}
         <form
           onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
-          className="p-3 sm:p-4 bg-slate-900/90 border-t border-slate-800 flex items-center gap-2"
+          className={`p-3 sm:p-4 border-t flex items-center gap-2 ${
+            isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+          }`}
         >
           {/* Voice Microphone Input Button */}
           <button
@@ -393,14 +546,31 @@ export default function AIAssistant() {
             type="text"
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
+<<<<<<< HEAD
             placeholder={isListening ? `Listening in ${currentLangConfig.name}... Speak now!` : `Ask a budget question in ${currentLangConfig.name}...`}
             className="flex-1 px-4 py-3 text-xs bg-slate-950 border border-slate-700/80 rounded-2xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+=======
+            placeholder={t.askQuestionPlaceholder}
+            className={`flex-1 px-4 py-3 text-xs sm:text-sm rounded-2xl border focus:outline-none ${
+              isDark
+                ? 'bg-slate-900 border-slate-700 text-slate-100 placeholder-slate-500'
+                : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 shadow-inner'
+            }`}
+>>>>>>> 9f930c6 (Frontend Updates and languages Addition)
           />
 
           <button
+            type="button"
+            onClick={() => setVoiceModalOpen(true)}
+            className="p-3 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-cyan-400 hover:bg-slate-300 dark:hover:bg-slate-700"
+            title={t.askVoice}
+          >
+            <Mic className="w-4 h-4" />
+          </button>
+          <button
             type="submit"
             disabled={!inputQuery.trim()}
-            className="px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-500/20 disabled:opacity-40 transition-all"
+            className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md disabled:opacity-40 transition-all"
           >
             <span>Ask</span>
             <Send className="w-3.5 h-3.5" />
@@ -408,6 +578,19 @@ export default function AIAssistant() {
         </form>
 
       </div>
+
+      <VoiceInputModal
+        isOpen={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onResult={(text) => handleSendMessage(text)}
+      />
+
+      <WhyExplanationModal
+        isOpen={!!whyTopic}
+        onClose={() => setWhyTopic(null)}
+        topicKey={whyTopic}
+      />
+
     </div>
   );
 }
