@@ -63,7 +63,6 @@ export default function Home() {
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* CivicLens USP Central Product Story Banner */}
       <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -95,11 +94,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      {/* KPI Stats Grid - Top Sector Budget Metrics */}
-=======
-      {/* Main Budget Summary Statistics Grid */}
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
       <section className="space-y-4">
 
         <div className="flex items-center justify-between">

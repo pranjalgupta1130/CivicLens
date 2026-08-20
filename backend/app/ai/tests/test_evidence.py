@@ -1,10 +1,10 @@
 """Tests for Evidence Validation and Zero-Hallucination Grounding."""
 
 import pytest
-from ai.state import InvestigationState
-from ai.nodes import validate_evidence_node, generate_grounded_explanation_node
-from ai.gemini import MockGeminiAdapter
-from ai.schemas import InvestigationStatus
+from app.ai.state import InvestigationState
+from app.ai.nodes import validate_evidence_node, generate_grounded_explanation_node
+from app.ai.gemini import MockGeminiAdapter
+from app.ai.schemas import InvestigationStatus
 
 
 def test_validate_evidence_with_valid_documents():

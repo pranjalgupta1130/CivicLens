@@ -84,7 +84,6 @@ class GroundedRAGGenerator:
         )
 
         if self.client:
-        if self.client:
             try:
                 response = self.client.models.generate_content(
                     model=self.model_name,
@@ -95,7 +94,7 @@ class GroundedRAGGenerator:
                 )
                 if response and response.text:
                     return {
-                        "answer": response.text,
+                        "answer": response.text.strip(),
                         "sources": sources_list,
                         "confidence": "HIGH" if len(sources_list) >= 2 else "MODERATE"
                     }
@@ -130,7 +129,7 @@ class GroundedRAGGenerator:
         # Fallback when no document chunks are retrieved
         return {
             "answer": (
-                "No relevant document records were found for this query. "
+                "No relevant budget records were found for this query. "
                 "Please upload a budget document (PDF or CSV) to get grounded answers with source citations."
             ),
             "sources": [],

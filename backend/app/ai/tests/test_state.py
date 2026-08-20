@@ -1,14 +1,14 @@
 """Tests for InvestigationState and Pydantic Schemas."""
 
 import pytest
-from ai.schemas import (
+from app.ai.schemas import (
     AnomalyPayload,
     HistoricalSpendingRecord,
     EvidenceDocument,
     InvestigationStatus,
     InvestigationResult,
 )
-from ai.state import InvestigationState
+from app.ai.state import InvestigationState
 
 
 def test_anomaly_payload_creation():

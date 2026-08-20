@@ -7,6 +7,7 @@ using the official Google Gen AI SDK (`google.genai`).
 import os
 import hashlib
 import math
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Union
 from dotenv import load_dotenv
@@ -43,9 +44,20 @@ class GeminiEmbeddingEngine:
         self.model_name = raw_model.replace("models/", "")
 
     def _fallback_embedding(self, text: str, dimension: int = 768) -> List[float]:
-        """Generates a deterministic float vector based on text hash for offline/fallback use."""
-        seed = int(hashlib.md5(text.encode("utf-8")).hexdigest(), 16)
-        return [math.sin(seed + i) for i in range(dimension)]
+        """Generates a deterministic float vector based on stemmed word hashes for offline/fallback use."""
+        vec = [0.0] * dimension
+        words = re.findall(r'\w+', text.lower())
+        if not words:
+            return vec
+        for word in words:
+            stemmed = word[:-2] if word.endswith("ly") and len(word) > 4 else (word[:-3] if word.endswith("ing") and len(word) > 5 else word)
+            seed = int(hashlib.md5(stemmed.encode("utf-8")).hexdigest(), 16)
+            idx = seed % dimension
+            vec[idx] += 1.0
+        norm = math.sqrt(sum(x * x for x in vec))
+        if norm > 0:
+            vec = [x / norm for x in vec]
+        return vec
 
     def embed_text(self, text: str) -> List[float]:
         """Embeds a single document chunk text using RETRIEVAL_DOCUMENT task type."""

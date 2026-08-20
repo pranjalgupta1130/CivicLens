@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 async function fetchWithTimeout(url, options = {}, timeoutMs = 3000) {
   const controller = new AbortController();
@@ -20,7 +20,7 @@ export const governmentApi = {
   // Get dashboard summary KPIs
   async getDashboardSummary() {
     try {
-      return await fetchWithTimeout(`${BASE_URL}/dashboard/summary`);
+      return await fetchWithTimeout(`${BASE_URL}/dashboard`);
     } catch (error) {
       console.warn("Backend unavailable, using fallback mock for dashboard summary:", error.message);
       return null;
@@ -50,7 +50,7 @@ export const governmentApi = {
   // Query RAG explanation or AI assistant answer
   async askQuestion(question, language = 'en') {
     try {
-      return await fetchWithTimeout(`${BASE_URL}/investigations/query`, {
+      return await fetchWithTimeout(`${BASE_URL}/assistant`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, language })

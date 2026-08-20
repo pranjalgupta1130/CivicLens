@@ -9,14 +9,6 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-<<<<<<< HEAD
-import { detailedBudgets, departmentBudgets as mockDeptBudgets } from '../data/mockData';
-import { useLanguage } from '../context/LanguageContext';
-
-export default function BudgetExplorer() {
-  const { t } = useLanguage();
-  const [searchParams, setSearchParams] = useSearchParams();
-=======
 import WhyExplanationModal from '../components/WhyExplanationModal';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -26,10 +18,8 @@ export default function BudgetExplorer() {
   const { t } = useLanguage();
   const { isDark } = useTheme();
 
-  const [searchParams] = useSearchParams();
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('search') || '';
-
 
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedDept, setSelectedDept] = useState('All');
@@ -181,7 +171,6 @@ export default function BudgetExplorer() {
     return matchesSearch && matchesDept && matchesStatus;
   });
 
-<<<<<<< HEAD
   const chartData = filteredItems.slice(0, 10).map(item => {
     const rawAlloc = item.budget_amount !== undefined ? item.budget_amount : item.allocated;
     const rawSpent = item.actual_amount !== undefined ? item.actual_amount : item.spent;
@@ -195,13 +184,6 @@ export default function BudgetExplorer() {
       Spent: spentCr
     };
   });
-=======
-  const chartData = filteredItems.map(item => ({
-    name: item.title.length > 18 ? item.title.substring(0, 18) + '...' : item.title,
-    Allocated: item.allocated / 10000000,
-    Spent: item.spent / 10000000
-  }));
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
   const formatCurrency = (val) => {
     if (val === undefined || val === null) return '₹0 Cr';
@@ -211,19 +193,18 @@ export default function BudgetExplorer() {
 
   const availableDepartments = departments.length > 0
     ? departments.map(d => ({ code: d.code, name: d.name }))
-    : mockDeptBudgets.map(d => ({ code: d.code, name: d.name }));
+    : detailedBudgets.map(d => ({ code: d.id, name: d.department }));
 
   const handleExportCSV = () => {
-    const headers = "ID,Title,Department,Category,Allocated(Cr),Spent(Cr),Status,Locality,AnomalyRisk\n";
+    const headers = "ID,Title,Department,Category,Allocated(Cr),Spent(Cr),Status,Locality\n";
     const rows = filteredItems.map(i => {
       const title = i.scheme_name || i.title || '';
       const dept = i.department_name || i.department || '';
       const alloc = i.budget_amount !== undefined ? (i.budget_amount >= 1000000 ? i.budget_amount/10000000 : i.budget_amount) : i.allocated/10000000;
       const spent = i.actual_amount !== undefined ? (i.actual_amount >= 1000000 ? i.actual_amount/10000000 : i.actual_amount) : i.spent/10000000;
-      const status = getRecordStatus(i);
-      const risk = getRecordRisk(i);
+      const status = i.status || 'On Track';
       const locality = i.locality || i.vendor || '';
-      return `"${i.id}","${title}","${dept}","${i.category}",${alloc},${spent},"${status}","${locality}","${risk}"`;
+      return `"${i.id}","${title}","${dept}","${i.category || ''}",${alloc},${spent},"${status}","${locality}"`;
     }).join("\n");
 
     const blob = new Blob([headers + rows], { type: 'text/csv' });
@@ -233,7 +214,6 @@ export default function BudgetExplorer() {
     a.download = `CivicLens_Budget_Export_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
   };
-
 
   return (
     <div className="space-y-8 pb-12">
@@ -310,49 +290,22 @@ export default function BudgetExplorer() {
               <option value="All">All Execution Statuses</option>
               <option value="On Track">On Track</option>
               <option value="Over Budget">Over Budget</option>
-<<<<<<< HEAD
               <option value="Under Budget">Under Budget</option>
-=======
               <option value="Completed">Completed</option>
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
             </select>
           </div>
 
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* Loading State */}
-      {isLoading && (
-        <div className="glass-panel rounded-3xl p-12 text-center text-slate-400 space-y-3 border border-slate-800">
-          <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mx-auto" />
-          <p className="text-xs">Fetching live government budget records from backend API...</p>
-        </div>
-      )}
-
-      {/* Error State with Retry */}
-      {error && !isLoading && !isUsingFallback && (
-        <div className="glass-panel rounded-3xl p-8 text-center text-rose-300 border border-rose-500/30 space-y-4">
-          <AlertCircle className="w-8 h-8 text-rose-400 mx-auto" />
-          <div>
-            <p className="text-sm font-semibold">{error}</p>
-            <p className="text-xs text-slate-400 mt-1">Please verify backend FastAPI server is running on http://localhost:8000</p>
-          </div>
-          <button
-            onClick={fetchBudgetData}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 transition-all"
-          >
-            Retry Loading Budgets
-          </button>
-=======
       {/* Filtered Bar Chart Preview */}
       {filteredItems.length > 0 && (
         <div className={`rounded-3xl p-6 border shadow-sm ${
           isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold font-display">{t.chartWhichSectorMost}</h3>
-            <span className="text-xs text-slate-500 dark:text-slate-400">Showing {filteredItems.length} schemes</span>
+            <h3 className="text-sm font-bold font-display">{t.chartWhichSectorMost || "Scheme Allocation Comparison (₹ Crore)"}</h3>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Showing {filteredItems.length} matching government schemes</span>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -381,192 +334,71 @@ export default function BudgetExplorer() {
               <tr>
                 <th className="px-4 py-3">Scheme Title & ID</th>
                 <th className="px-4 py-3">Department</th>
-                <th className="px-4 py-3">Vendor / Contractor</th>
+                <th className="px-4 py-3">Locality / Vendor</th>
                 <th className="px-4 py-3">Money Allocated</th>
                 <th className="px-4 py-3">Money Spent</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-center">Unusual Flag</th>
                 <th className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-              {filteredItems.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="px-4 py-3.5">
-                    <div className="font-bold">{item.title}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{item.id} • {item.category}</div>
-                  </td>
-                  <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300">{item.department}</td>
-                  <td className="px-4 py-3.5 text-blue-600 dark:text-cyan-400 font-bold">{item.vendor}</td>
-                  <td className="px-4 py-3.5 font-bold">{formatCurrency(item.allocated)}</td>
-                  <td className="px-4 py-3.5 font-bold text-blue-600 dark:text-cyan-400">{formatCurrency(item.spent)}</td>
-                  <td className="px-4 py-3.5">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                      item.status.includes('Over')
-                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200'
-                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-center">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      item.anomalyRisk === 'High'
-                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
-                        : item.anomalyRisk === 'Medium'
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
-                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                    }`}>
-                      {item.anomalyRisk} Risk
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-right flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => setWhyTopic(item.department)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 border border-blue-200 dark:border-slate-700"
-                    >
-                      {t.whyBtn}
-                    </button>
-                    <button
-                      onClick={() => setSelectedBudgetItem(item)}
-                      className="px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-white dark:bg-slate-700"
-                    >
-                      {t.inspectDetails}
-                    </button>
+              {filteredItems.map((item) => {
+                const title = item.scheme_name || item.title || 'Government Scheme Outlay';
+                const dept = item.department_name || item.department || 'General';
+                const locality = item.locality || item.vendor || 'State Authority';
+                const alloc = item.budget_amount !== undefined ? item.budget_amount : item.allocated;
+                const spent = item.actual_amount !== undefined ? item.actual_amount : item.spent;
+                const status = item.status || 'On Track';
+                const itemId = item.id || `BUD-${item.year || 2026}`;
+
+                return (
+                  <tr key={itemId} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-4 py-3.5">
+                      <div className="font-bold">{title}</div>
+                      <div className="text-[10px] text-slate-400 font-mono">{itemId} • {item.category || 'General'}</div>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-600 dark:text-slate-300">{dept}</td>
+                    <td className="px-4 py-3.5 font-bold text-blue-600 dark:text-cyan-400">{locality}</td>
+                    <td className="px-4 py-3.5 font-bold">{formatCurrency(alloc)}</td>
+                    <td className="px-4 py-3.5 font-bold text-blue-600 dark:text-cyan-400">{formatCurrency(spent)}</td>
+                    <td className="px-4 py-3.5">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                        status.includes('Over')
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200'
+                          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200'
+                      }`}>
+                        {status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-right flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setWhyTopic(dept)}
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 border border-blue-200 dark:border-slate-700"
+                      >
+                        {t.whyBtn || "Why?"}
+                      </button>
+                      <button
+                        onClick={() => setSelectedBudgetItem(item)}
+                        className="px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-white dark:bg-slate-700"
+                      >
+                        {t.inspectDetails || "Inspect"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredItems.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                    No budget schemes match your search filters. Try resetting search parameters.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
         </div>
-      )}
+      </div>
 
-<<<<<<< HEAD
-      {/* Main Content Area */}
-      {!isLoading && (!error || isUsingFallback) && (
-        <>
-          {/* Filtered Bar Chart Preview */}
-          {filteredItems.length > 0 && (
-            <div className="glass-panel rounded-3xl p-6 border border-slate-800">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold font-display text-white">Scheme Allocation Comparison (₹ Crore)</h3>
-                  {budgets.length > 0 && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Live Backend API Data ({budgets.length} records)
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs text-slate-400">Showing {filteredItems.length} matching government schemes</span>
-              </div>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f293d" vertical={false} />
-                    <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} angle={-15} textAnchor="end" />
-                    <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
-                    <Tooltip formatter={(val) => `₹${val} Cr`} />
-                    <Bar dataKey="Allocated" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Spent" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
-
-          {/* Budget Table */}
-          <div className="glass-panel rounded-3xl p-6 border border-slate-800 space-y-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-900/80 uppercase text-[10px] font-semibold tracking-wider text-slate-400 border-b border-slate-800">
-                  <tr>
-                    <th className="px-4 py-3">Scheme Title & ID</th>
-                    <th className="px-4 py-3">Department</th>
-                    <th className="px-4 py-3">Locality / Region</th>
-                    <th className="px-4 py-3">Allocated</th>
-                    <th className="px-4 py-3">Spent</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-center">AI Risk</th>
-                    <th className="px-4 py-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {filteredItems.map((item) => {
-                    const title = item.scheme_name || item.title || 'Government Scheme Outlay';
-                    const dept = item.department_name || item.department || 'General';
-                    const locality = item.locality || item.vendor || 'State Authority';
-                    const alloc = item.budget_amount !== undefined ? item.budget_amount : item.allocated;
-                    const spent = item.actual_amount !== undefined ? item.actual_amount : item.spent;
-                    const status = getRecordStatus(item);
-                    const risk = getRecordRisk(item);
-                    const itemId = item.id || `BUD-${item.year || 2026}`;
-
-                    return (
-                      <tr key={itemId} className="hover:bg-slate-800/40 transition-colors">
-                        <td className="px-4 py-3.5">
-                          <div className="font-semibold text-slate-100">{title}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">{itemId.substring(0, 18)} • {item.category} ({item.year || 2026})</div>
-                        </td>
-                        <td className="px-4 py-3.5 text-slate-300">{dept}</td>
-                        <td className="px-4 py-3.5 text-slate-300 font-medium">{locality}</td>
-                        <td className="px-4 py-3.5 font-mono text-slate-200">{formatCurrency(alloc)}</td>
-                        <td className="px-4 py-3.5 font-mono text-cyan-400 font-semibold">{formatCurrency(spent)}</td>
-                        <td className="px-4 py-3.5">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            status.includes('Over')
-                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          }`}>
-                            {status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 text-center">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            risk === 'High'
-                              ? 'bg-rose-950 text-rose-400 border border-rose-800'
-                              : risk === 'Medium'
-                              ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                              : 'bg-slate-800 text-slate-400'
-                          }`}>
-                            {risk}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 text-right">
-                          <button
-                            onClick={() => handleInspectRecord(item)}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 transition-colors"
-                          >
-                            Inspect
-                          </button>
-
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredItems.length === 0 && (
-                    <tr>
-                      <td colSpan={8} className="py-12 text-center text-slate-500">
-                        No budget schemes match your search filters. Try resetting search parameters.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
-
-
-      {/* Government Scheme Ledger Dossier Modal (Phase 1C) */}
-      {selectedBudgetItem && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 border border-slate-700 bg-slate-900 shadow-2xl animate-in fade-in zoom-in-95 space-y-4">
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-=======
       {/* Scheme Detail Dossier Modal */}
       {selectedBudgetItem && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -574,37 +406,17 @@ export default function BudgetExplorer() {
             isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
           }`}>
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-600 dark:text-cyan-400" />
                 <h3 className="font-bold text-base font-display">Government Scheme Public Record</h3>
               </div>
-<<<<<<< HEAD
-              <button
-                onClick={() => { setSelectedBudgetItem(null); setDossierData(null); }}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              >
-=======
               <button onClick={() => setSelectedBudgetItem(null)} className="p-1 text-slate-400 hover:text-slate-600">
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-<<<<<<< HEAD
-            {/* Scheme Title Header */}
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-400">Scheme Outlay</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-[10px] text-slate-400 font-mono">FY {selectedBudgetItem.year || 2026}</span>
-              </div>
-              <h3 className="text-lg font-bold text-white mt-0.5">{selectedBudgetItem.title}</h3>
-              <p className="text-xs text-slate-400 font-mono">{selectedBudgetItem.id} • Category: {selectedBudgetItem.category}</p>
-            </div>
-
-            {/* Citizen-Friendly Summary Banner */}
-            <div className={`p-4 rounded-2xl border ${
+            {/* Status Summary Banner */}
+            <div className={`mt-4 p-4 rounded-2xl border ${
               selectedBudgetItem.status.includes('Over')
                 ? 'bg-rose-500/10 border-rose-500/30 text-rose-200'
                 : selectedBudgetItem.status.includes('Under')
@@ -743,46 +555,12 @@ export default function BudgetExplorer() {
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="pt-3 border-t border-slate-800 flex justify-end">
-              <button
-                onClick={() => { setSelectedBudgetItem(null); setDossierData(null); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300"
-=======
-            <div className="py-4 space-y-4 text-xs">
-              <div>
-                <span className="text-[10px] font-semibold uppercase text-slate-400">Scheme Name</span>
-                <h4 className="text-base font-bold">{selectedBudgetItem.title}</h4>
-                <p className="text-slate-400 font-mono">{selectedBudgetItem.id} • Category: {selectedBudgetItem.category}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                <div>
-                  <span className="text-slate-500">Department:</span>
-                  <p className="font-bold mt-0.5">{selectedBudgetItem.department}</p>
-                </div>
-                <div>
-                  <span className="text-slate-500">Awarded Contractor:</span>
-                  <p className="font-bold text-blue-600 dark:text-cyan-400 mt-0.5">{selectedBudgetItem.vendor}</p>
-                </div>
-                <div>
-                  <span className="text-slate-500">Total Outlay Allocated:</span>
-                  <p className="font-mono font-bold text-sm mt-0.5">{formatCurrency(selectedBudgetItem.allocated)}</p>
-                </div>
-                <div>
-                  <span className="text-slate-500">Money Already Spent:</span>
-                  <p className="font-mono font-bold text-blue-600 dark:text-cyan-400 text-sm mt-0.5">{formatCurrency(selectedBudgetItem.spent)}</p>
-                </div>
-              </div>
-            </div>
-
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setSelectedBudgetItem(null)}
                 className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
               >
-                {t.closeBtn}
+                {t.closeBtn || "Close"}
               </button>
             </div>
 
@@ -790,14 +568,11 @@ export default function BudgetExplorer() {
         </div>
       )}
 
-<<<<<<< HEAD
-=======
       <WhyExplanationModal
         isOpen={!!whyTopic}
         onClose={() => setWhyTopic(null)}
         topicKey={whyTopic}
       />
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
     </div>
   );

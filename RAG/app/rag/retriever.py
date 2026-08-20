@@ -59,7 +59,14 @@ class VectorRetriever:
             return []
 
         query_vector = self.embedding_engine.embed_query(query)
-        query_words = set(re.findall(r'\w+', query.lower()))
+        stop_words = {"what", "was", "is", "the", "in", "for", "how", "much", "of", "a", "an", "to", "and", "or", "on", "at", "by", "with"}
+        financial_synonyms = {"spent": "expenditure", "spending": "expenditure", "allocated": "budget", "allocation": "budget", "cost": "expenditure"}
+        raw_words = set(re.findall(r'\w+', query.lower()))
+        base_words = set(w for w in raw_words if w not in stop_words) or raw_words
+        query_words = set(base_words)
+        for w in base_words:
+            if w in financial_synonyms:
+                query_words.add(financial_synonyms[w])
         
         scored_chunks = []
         for item in self.vector_store:
@@ -71,7 +78,7 @@ class VectorRetriever:
             
             # Keyword score: ratio of query terms occurring in chunk content/metadata
             content_lower = (item.get("content", "") + " " + str(item.get("metadata", {}))).lower()
-            keyword_matches = sum(1 for word in query_words if word in content_lower)
+            keyword_matches = sum(1 for word in query_words if word in content_lower or (len(word) > 4 and word[:4] in content_lower))
             keyword_score = keyword_matches / max(1, len(query_words))
             
             # Combined hybrid score (70% vector similarity + 30% keyword match)

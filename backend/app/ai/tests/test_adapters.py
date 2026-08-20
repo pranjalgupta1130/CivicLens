@@ -1,8 +1,8 @@
 """Tests for Member 2 and Member 3 Demo Adapters."""
 
 import pytest
-from ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
-from ai.schemas import AnomalyPayload, EvidenceDocument
+from app.ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
+from app.ai.schemas import AnomalyPayload, EvidenceDocument
 
 
 def test_member2_get_anomaly_data():

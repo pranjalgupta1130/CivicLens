@@ -1,15 +1,15 @@
 """Integration tests for Controlled Tools connected to LangGraph Investigation Graph."""
 
 import pytest
-from ai.graph import create_investigation_graph, run_investigation
-from ai.schemas import AnomalyPayload, InvestigationStatus, EvidenceDocument
-from ai.adapters import (
+from app.ai.graph import create_investigation_graph, run_investigation
+from app.ai.schemas import AnomalyPayload, InvestigationStatus, EvidenceDocument
+from app.ai.adapters import (
     DemoMember2Adapter,
     DemoMember3RAGAdapter,
     Member2AdapterProtocol,
     Member3RAGAdapterProtocol,
 )
-from ai.gemini import MockGeminiAdapter
+from app.ai.gemini import MockGeminiAdapter
 
 
 class FaultyMember2Adapter(DemoMember2Adapter):

@@ -15,9 +15,19 @@ from app.rag.embeddings import GeminiEmbeddingEngine
 from app.rag.generator import GroundedRAGGenerator
 from app.rag.judge import LLMJudge
 
+from app.dependencies import get_retriever, get_ingestion_pipeline
+from app.ingestion.pipeline import IngestionPipeline
+
 @pytest.fixture
-def client():
-    return TestClient(app)
+def client(tmp_path):
+    storage_file = str(tmp_path / "test_vector_store.json")
+    test_retriever = VectorRetriever(storage_path=storage_file)
+    test_pipeline = IngestionPipeline(retriever=test_retriever)
+    app.dependency_overrides[get_retriever] = lambda: test_retriever
+    app.dependency_overrides[get_ingestion_pipeline] = lambda: test_pipeline
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
 
 # ==============================================================================
 # C1. RETRIEVAL THRESHOLD TESTS (RT1 - RT8)
@@ -233,6 +243,12 @@ def test_E2E1_budget_allocation_query(client):
 
 def test_E2E2_actual_spending_query(client):
     """E2E2: Query actual spending -> Returns 80 Cr."""
+    csv_bytes = (
+        "department,scheme,year,locality,category,budget_amount,actual_amount\n"
+        "Healthcare,Hospital Upgrade,2026,State,Infrastructure,100.0,80.0\n"
+    ).encode("utf-8")
+    client.post("/api/v1/ingest/csv", files={"file": ("healthcare_2026.csv", csv_bytes, "text/csv")})
+
     res = client.post("/api/v1/query", json={"query": "How much was actually spent on healthcare in 2026?"})
     assert res.status_code == 200
     data = res.json()
@@ -240,6 +256,12 @@ def test_E2E2_actual_spending_query(client):
 
 def test_E2E3_utilization_query(client):
     """E2E3: Query healthcare records -> Verified source attributions returned."""
+    csv_bytes = (
+        "department,scheme,year,locality,category,budget_amount,actual_amount\n"
+        "Healthcare,Hospital Upgrade,2026,State,Infrastructure,100.0,80.0\n"
+    ).encode("utf-8")
+    client.post("/api/v1/ingest/csv", files={"file": ("healthcare_2026.csv", csv_bytes, "text/csv")})
+
     res = client.post("/api/v1/query", json={"query": "Healthcare Hospital Upgrade infrastructure expenditure"})
     assert res.status_code == 200
     data = res.json()

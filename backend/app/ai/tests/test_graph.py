@@ -1,10 +1,10 @@
 """End-to-End Tests for CivicLens LangGraph Investigation Workflow."""
 
 import os
-from ai.graph import create_investigation_graph, run_investigation
-from ai.schemas import AnomalyPayload, InvestigationStatus
-from ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
-from ai.gemini import MockGeminiAdapter
+from app.ai.graph import create_investigation_graph, run_investigation
+from app.ai.schemas import AnomalyPayload, InvestigationStatus
+from app.ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
+from app.ai.gemini import MockGeminiAdapter
 
 
 def test_graph_compilation():
@@ -99,5 +99,5 @@ def test_investigation_with_invalid_anomaly_id():
 
 def test_no_hardcoded_secrets_in_repo():
     """Safety check ensuring no real API keys are committed in code."""
-    from ai.config import GEMINI_API_KEY
+    from app.ai.config import GEMINI_API_KEY
     assert not GEMINI_API_KEY.startswith("AIzaSy"), "Real Google API key detected in code!"

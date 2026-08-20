@@ -1,7 +1,7 @@
 """Tests for CivicLens Controlled Investigation Tools."""
 
 import pytest
-from ai.tools import (
+from app.ai.tools import (
     get_budget_record,
     get_historical_spending,
     compare_budget_periods,
@@ -9,7 +9,7 @@ from ai.tools import (
     get_source_metadata,
     INVESTIGATION_TOOLS,
 )
-from ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
+from app.ai.adapters import DemoMember2Adapter, DemoMember3RAGAdapter
 
 
 class FailingMember2Adapter:

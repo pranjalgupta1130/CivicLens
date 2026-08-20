@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Bell, Search, Sparkles, Menu, X, ShieldAlert, CheckCircle2, Globe } from 'lucide-react';
-import { aiAlertsData } from '../data/mockData';
-import { useLanguage } from '../context/LanguageContext';
-=======
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { 
   Eye, 
   Bell, 
   Search, 
   Menu, 
+  Sparkles,
   X, 
   ShieldAlert, 
   Mic, 
@@ -24,10 +19,9 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { aiAlertsData } from '../data/mockData';
 import VoiceInputModal from './VoiceInputModal';
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
 
 export default function Navbar() {
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang, selectedLang, setSelectedLang, SUPPORTED_LANGUAGES, t } = useLanguage();
   const { theme, toggleTheme, isDark } = useTheme();
   const { isAdminAuthenticated } = useAuth();
   
@@ -37,11 +31,6 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   
   const navigate = useNavigate();
-<<<<<<< HEAD
-  const { selectedLang, setSelectedLang, SUPPORTED_LANGUAGES, t } = useLanguage();
-
-=======
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
   const activeAlerts = aiAlertsData.filter(a => a.status === 'Active');
 
   const handleSearch = (e) => {
@@ -81,12 +70,10 @@ export default function Navbar() {
   ];
 
   return (
-<<<<<<< HEAD
-    <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-800 bg-[#0b0f19]/80 backdrop-blur-lg">
+    <>
+      <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0b0f19]/80 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
-          {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
@@ -196,38 +183,12 @@ export default function Navbar() {
                   >
                     View All Anomaly Alerts &rarr;
                   </Link>
-=======
-    <>
-      <header className={`sticky top-0 z-40 w-full border-b transition-colors ${
-        isDark
-          ? 'bg-[#0b0f19]/90 border-slate-800 text-slate-100 backdrop-blur-md'
-          : 'bg-white/95 border-slate-200 text-slate-900 shadow-sm backdrop-blur-md'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 gap-3">
-            
-            {/* Logo & Government Brand */}
-            <div className="flex items-center gap-6">
-              <Link to="/" className="flex items-center gap-2.5 group">
-                <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex-shrink-0">
-                  Govt Portal
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-emerald-600 flex items-center justify-center shadow-md text-white group-hover:scale-105 transition-transform flex-shrink-0">
-                  <Eye className="w-5 h-5" />
->>>>>>> 9f930c6 (Frontend Updates and languages Addition)
                 </div>
-                <div>
-                  <span className="font-display text-xl font-extrabold tracking-tight block">
-                    {t.brandName}
-                  </span>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                    {t.brandSubtitle}
-                  </p>
-                </div>
-              </Link>
+              )}
+            </div>
 
-              {/* Desktop Navigation Links */}
-              <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
                 {navLinks.map((link) => (
                   <NavLink
                     key={link.path}

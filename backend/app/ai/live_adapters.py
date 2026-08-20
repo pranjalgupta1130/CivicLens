@@ -171,6 +171,31 @@ class LiveMember3DBRAGAdapter:
     def retrieve_supporting_evidence(
         self, query: str, department: str, top_k: int = 3
     ) -> List[EvidenceDocument]:
+        # First: Try live HTTP request to standalone RAG microservice (:8001)
+        try:
+            import httpx
+            rag_url = os.getenv("RAG_SERVICE_URL", "http://localhost:8001/api/v1/query")
+            resp = httpx.post(
+                rag_url,
+                json={"query": query, "department_filter": department, "top_k": top_k},
+                timeout=3.0
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                results = []
+                for idx, src in enumerate(data.get("sources", [])):
+                    results.append(EvidenceDocument(
+                        document_id=f"rag-doc-{idx+1}",
+                        document_title=src.get("document", "Official Budget Record"),
+                        page_number=src.get("page", 1),
+                        relevant_chunk_text=src.get("excerpt", ""),
+                        source_url="http://localhost:8001/api/v1/query",
+                    ))
+                if results:
+                    return results
+        except Exception as e:
+            logger.info(f"Live RAG service HTTP query unavailable ({e}); trying local DB.")
+
         if self.db:
             try:
                 from app.models.integration import BudgetDocument, DocumentChunk
