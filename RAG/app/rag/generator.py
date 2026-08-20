@@ -84,6 +84,7 @@ class GroundedRAGGenerator:
         )
 
         if self.client:
+        if self.client:
             try:
                 response = self.client.models.generate_content(
                     model=self.model_name,
