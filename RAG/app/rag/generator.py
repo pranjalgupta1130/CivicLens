@@ -1,19 +1,22 @@
-"""
-CivicLens Grounded RAG Generator
-Combines query, retrieved document chunks, and structured budget records to generate
-verifiable, source-linked responses via Gemini 3.5 Flash.
-"""
-
 import os
 from typing import List, Dict, Any
-import google.generativeai as genai
+from dotenv import load_dotenv
+from google import genai  # Modern Google Gen AI SDK
+
+load_dotenv()
 
 class GroundedRAGGenerator:
     def __init__(self, api_key: str = None):
+        # Fall back to GEMINI_API_KEY if no key is manually passed
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        
+        # Initialize client directly with the key
         if self.api_key:
-            genai.configure(api_key=self.api_key)
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+            self.client = genai.Client(api_key=self.api_key)
+        else:
+            self.client = None
+            
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 
     def generate_answer(
         self,
@@ -24,7 +27,6 @@ class GroundedRAGGenerator:
         """
         Generates a grounded answer linked to specific sources.
         """
-        # Format sources context
         formatted_docs = ""
         sources_list = []
         for idx, chunk in enumerate(retrieved_chunks):
@@ -49,19 +51,22 @@ class GroundedRAGGenerator:
             f"STRUCTURED BUDGET RECORDS:\n{structured_budget_data or 'None provided'}\n"
         )
 
-        if self.api_key:
+        if self.client:
             try:
-                model = genai.GenerativeModel(self.model_name)
-                response = model.generate_content(system_prompt)
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=system_prompt
+                )
                 return {
                     "answer": response.text,
                     "sources": sources_list,
                     "confidence": "HIGH" if len(sources_list) >= 2 else "MODERATE"
                 }
             except Exception as e:
-                print(f"[GroundedRAGGenerator] API Warning: {e}. Using deterministic synthesis.")
+                # Watch your terminal output for this error message to debug API/key issues
+                print(f"[GroundedRAGGenerator] API Warning: {e}. Using fallback synthesis.")
 
-        # Fallback response if offline / API key pending
+        # Fallback response if client setup failed or request errored
         return {
             "answer": (
                 f"Based on retrieved official records, healthcare allocations increased by 70% in FY2026. "
