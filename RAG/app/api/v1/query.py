@@ -5,6 +5,8 @@ from app.dependencies import get_retriever, get_generator
 from app.rag.retriever import VectorRetriever
 from app.rag.generator import GroundedRAGGenerator
 
+from app.rag.judge import LLMJudge
+
 router = APIRouter(tags=["RAG Query Engine"])
 
 @router.post(
@@ -35,11 +37,18 @@ async def process_query(
             retrieved_chunks=chunks
         )
 
+        # Step 3: LLM-as-a-Judge evaluation for grounding and numerical consistency
+        evaluation = LLMJudge.evaluate_answer(
+            query=request.query,
+            answer=result["answer"],
+            retrieved_chunks=chunks
+        )
 
         return QueryResponse(
             answer=result["answer"],
             sources=result["sources"],
-            confidence=result["confidence"]
+            confidence=result["confidence"],
+            evaluation=evaluation
         )
     except Exception as e:
         raise HTTPException(
