@@ -1,9 +1,14 @@
+
 node_modules/
 dist/
 
+=======
+# Environment variables / secrets
+>>>>>>> 5600c12 (feat: add member 2 backend and Supabase integration)
 .env
 .env.*
 !.env.example
+
 
 __pycache__/
 *.py[cod]
@@ -18,3 +23,12 @@ venv/
 
 .DS_Store
 Thumbs.db
+=======
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local database
+*.db
+

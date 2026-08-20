@@ -1,0 +1,21 @@
+department_code,department_name,scheme_code,scheme_name,year,locality,category,budget_amount,actual_amount
+HEALTH,Public Health & Family Welfare,HOSP_EXP,Hospital Infrastructure Expansion,2023,Mumbai,Capital Expenditure,500000000.00,500000000.00
+HEALTH,Public Health & Family Welfare,HOSP_EXP,Hospital Infrastructure Expansion,2024,Mumbai,Capital Expenditure,550000000.00,550000000.00
+HEALTH,Public Health & Family Welfare,HOSP_EXP,Hospital Infrastructure Expansion,2025,Mumbai,Capital Expenditure,600000000.00,600000000.00
+HEALTH,Public Health & Family Welfare,HOSP_EXP,Hospital Infrastructure Expansion,2026,Mumbai,Capital Expenditure,1400000000.00,1700000000.00
+EDU,School Education & Literacy,SMART_CLS,Smart Classroom & Digital Education,2023,Pune,Capital Expenditure,800000000.00,800000000.00
+EDU,School Education & Literacy,SMART_CLS,Smart Classroom & Digital Education,2024,Pune,Capital Expenditure,820000000.00,820000000.00
+EDU,School Education & Literacy,SMART_CLS,Smart Classroom & Digital Education,2025,Pune,Capital Expenditure,850000000.00,850000000.00
+EDU,School Education & Literacy,SMART_CLS,Smart Classroom & Digital Education,2026,Pune,Capital Expenditure,650000000.00,620000000.00
+TRANS,Urban Transport & Metro,METRO_DEV,Metro Line 3 Expansion & Modernization,2023,Mumbai,Capital Expenditure,900000000.00,900000000.00
+TRANS,Urban Transport & Metro,METRO_DEV,Metro Line 3 Expansion & Modernization,2024,Mumbai,Capital Expenditure,950000000.00,950000000.00
+TRANS,Urban Transport & Metro,METRO_DEV,Metro Line 3 Expansion & Modernization,2025,Mumbai,Capital Expenditure,1000000000.00,1000000000.00
+TRANS,Urban Transport & Metro,METRO_DEV,Metro Line 3 Expansion & Modernization,2026,Mumbai,Capital Expenditure,1400000000.00,1450000000.00
+INFRA,Public Works & Road Infrastructure,ROAD_DEV,Pothole Repair & Flyover Development,2023,Nagpur,Capital Expenditure,400000000.00,400000000.00
+INFRA,Public Works & Road Infrastructure,ROAD_DEV,Pothole Repair & Flyover Development,2024,Nagpur,Capital Expenditure,420000000.00,410000000.00
+INFRA,Public Works & Road Infrastructure,ROAD_DEV,Pothole Repair & Flyover Development,2025,Nagpur,Capital Expenditure,450000000.00,440000000.00
+INFRA,Public Works & Road Infrastructure,ROAD_DEV,Pothole Repair & Flyover Development,2026,Nagpur,Capital Expenditure,480000000.00,470000000.00
+ENV,Environment & Climate Action,SOLAR_URBAN,Rooftop Solar & Urban Greenery,2023,Pune,Capital Expenditure,150000000.00,150000000.00
+ENV,Environment & Climate Action,SOLAR_URBAN,Rooftop Solar & Urban Greenery,2024,Pune,Capital Expenditure,180000000.00,175000000.00
+ENV,Environment & Climate Action,SOLAR_URBAN,Rooftop Solar & Urban Greenery,2025,Pune,Capital Expenditure,200000000.00,200000000.00
+ENV,Environment & Climate Action,SOLAR_URBAN,Rooftop Solar & Urban Greenery,2026,Pune,Capital Expenditure,400000000.00,420000000.00
