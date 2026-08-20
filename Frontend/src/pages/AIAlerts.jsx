@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   ShieldAlert, 
   AlertTriangle, 
@@ -11,41 +12,111 @@ import {
   Clock, 
   X,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
-import { aiAlertsData } from '../data/mockData';
+
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AIAlerts() {
-  const [alertsList, setAlertsList] = useState(aiAlertsData);
+  const { t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedAnomalyId = searchParams.get('anomaly');
+
+
+  const [anomalies, setAnomalies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [filterSeverity, setFilterSeverity] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [activeModalAlert, setActiveModalAlert] = useState(null);
 
-  const handleStatusChange = (alertId, newStatus) => {
-    setAlertsList(prev => prev.map(a => a.id === alertId ? { ...a, status: newStatus } : a));
-    if (activeModalAlert && activeModalAlert.id === alertId) {
-      setActiveModalAlert(prev => ({ ...prev, status: newStatus }));
+  const [activeModalAlert, setActiveModalAlert] = useState(null);
+  const [activeInvestigation, setActiveInvestigation] = useState(null);
+  const [isInvestigating, setIsInvestigating] = useState(false);
+
+  const fetchAnomalies = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/anomalies');
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+      setAnomalies(data);
+
+      if (selectedAnomalyId) {
+        const target = data.find(a => a.id === selectedAnomalyId);
+        if (target) {
+          handleInvestigateAnomaly(target);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch anomalies from server:', err);
+      setError('Could not load anomaly risk flags from server. Please verify backend is running.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const filteredAlerts = alertsList.filter((alert) => {
-    const matchesSeverity = filterSeverity === 'All' || alert.severity === filterSeverity;
-    const matchesStatus = filterStatus === 'All' || alert.status === filterStatus;
+  useEffect(() => {
+    fetchAnomalies();
+  }, []);
+
+  const handleInvestigateAnomaly = async (anomaly) => {
+    setActiveModalAlert(anomaly);
+    setIsInvestigating(true);
+    setActiveInvestigation(null);
+
+    try {
+      const res = await fetch(`/api/investigations/run/${anomaly.id}`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        const invData = await res.json();
+        setActiveInvestigation(invData);
+      }
+    } catch (err) {
+      console.warn('Investigation trigger failed:', err);
+    } finally {
+      setIsInvestigating(false);
+    }
+  };
+
+  const formatCr = (val) => {
+    if (val === undefined || val === null) return '₹0 Cr';
+    const cr = val >= 1000000 ? val / 10000000 : val;
+    return `₹${cr.toLocaleString('en-IN', { maximumFractionDigits: 1 })} Cr`;
+  };
+
+  const filteredAlerts = anomalies.filter((alert) => {
+    const matchesSeverity = filterSeverity === 'All' || alert.severity.toUpperCase() === filterSeverity.toUpperCase();
+    const matchesStatus = filterStatus === 'All' || alert.status.toUpperCase() === filterStatus.toUpperCase();
     return matchesSeverity && matchesStatus;
   });
 
-  const criticalCount = alertsList.filter(a => a.severity === 'Critical' && a.status === 'Active').length;
-  const warningCount = alertsList.filter(a => a.severity === 'Warning' && a.status === 'Active').length;
-  const resolvedCount = alertsList.filter(a => a.status === 'Resolved').length;
+  const criticalCount = anomalies.filter(a => a.severity === 'HIGH').length;
+  const warningCount = anomalies.filter(a => a.severity === 'MEDIUM').length;
+  const resolvedCount = anomalies.filter(a => a.status === 'INVESTIGATED' || a.status === 'RESOLVED').length;
 
   const getSeverityBadge = (severity) => {
-    if (severity === 'Critical') {
+    const s = severity?.toUpperCase();
+    if (s === 'HIGH' || s === 'CRITICAL') {
       return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
     }
-    if (severity === 'Warning') {
+    if (s === 'MEDIUM' || s === 'WARNING') {
       return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
     }
     return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
+  };
+
+  const getRiskScore = (alert) => {
+    const s = alert.severity?.toUpperCase();
+    const pct = Math.abs(alert.percentage_change || 0);
+    if (s === 'HIGH') return Math.min(85 + Math.round(pct / 10), 99);
+    if (s === 'MEDIUM') return Math.min(60 + Math.round(pct / 10), 84);
+    return Math.min(30 + Math.round(pct / 10), 59);
   };
 
   return (
@@ -54,225 +125,340 @@ export default function AIAlerts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
-            AI Anomaly & Fraud Monitor
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white">
+              AI Anomaly & Risk Monitor
+            </h1>
+            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              LangGraph Audit Engine Active
+            </span>
+          </div>
           <p className="text-xs sm:text-sm text-slate-400">
-            Algorithmic flags generated by continuous ledger pattern recognition and price benchmarks.
+            Algorithmic flags generated by continuous ledger pattern recognition, spending spikes, and baseline benchmarks.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-            <span>{criticalCount} Critical Unresolved</span>
+            <span>{criticalCount} High Risk Flags</span>
           </span>
         </div>
       </div>
 
-      {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        
-        <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+      {/* Loading & Error States */}
+      {isLoading && (
+        <div className="glass-panel rounded-3xl p-12 text-center text-slate-400 space-y-3 border border-slate-800">
+          <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mx-auto" />
+          <p className="text-xs">Fetching live spending anomalies and risk scores from backend API...</p>
+        </div>
+      )}
+
+      {error && !isLoading && (
+        <div className="glass-panel rounded-3xl p-8 text-center text-rose-300 border border-rose-500/30 space-y-4">
+          <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto" />
           <div>
-            <span className="text-xs uppercase font-semibold text-slate-400">Critical Threats</span>
-            <h3 className="text-2xl font-bold font-display text-rose-400 mt-1">{criticalCount} Active</h3>
-            <p className="text-[11px] text-slate-400 mt-1">Requires immediate treasury action</p>
+            <p className="text-sm font-semibold">{error}</p>
+            <p className="text-xs text-slate-400 mt-1">Verify backend FastAPI server is running on http://localhost:8000</p>
           </div>
-          <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase font-semibold text-slate-400">Warnings & Surges</span>
-            <h3 className="text-2xl font-bold font-display text-amber-400 mt-1">{warningCount} Active</h3>
-            <p className="text-[11px] text-slate-400 mt-1">Velocity and pattern spikes</p>
-          </div>
-          <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
-            <AlertTriangle className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase font-semibold text-slate-400">Resolved Audit Flags</span>
-            <h3 className="text-2xl font-bold font-display text-emerald-400 mt-1">{resolvedCount} Audited</h3>
-            <p className="text-[11px] text-slate-400 mt-1">Cleared by city audit board</p>
-          </div>
-          <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-400 mr-2">Severity:</span>
-          {['All', 'Critical', 'Warning', 'Info'].map((sev) => (
-            <button
-              key={sev}
-              onClick={() => setFilterSeverity(sev)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                filterSeverity === sev
-                  ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-              }`}
-            >
-              {sev}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-400 mr-2">Status:</span>
-          {['All', 'Active', 'Under Review', 'Resolved'].map((st) => (
-            <button
-              key={st}
-              onClick={() => setFilterStatus(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                filterStatus === st
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-              }`}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
-
-      </div>
-
-      {/* Alert Feed Cards */}
-      <div className="space-y-4">
-        {filteredAlerts.map((alert) => (
-          <div
-            key={alert.id}
-            className="glass-panel glass-panel-hover rounded-2xl p-5 border border-slate-800 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+          <button
+            onClick={fetchAnomalies}
+            className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-500/20 text-rose-200 border border-rose-500/40"
           >
-            <div className="space-y-2 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getSeverityBadge(alert.severity)}`}>
-                  {alert.severity}
-                </span>
-                <span className="text-xs font-mono text-cyan-400 font-semibold">{alert.id}</span>
-                <span className="text-xs text-slate-400">• {alert.department}</span>
-                <span className="text-[11px] text-slate-500 ml-auto md:ml-0">{alert.date}</span>
-              </div>
+            Retry Loading Anomalies
+          </button>
+        </div>
+      )}
 
-              <h3 className="text-base font-bold text-white font-display">{alert.title}</h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">{alert.description}</p>
-              
-              <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
-                <span className="font-semibold text-cyan-400">AI Recommendation:</span>
-                <span className="line-clamp-1">{alert.recommendation}</span>
+      {!isLoading && !error && (
+        <>
+          {/* Summary KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs uppercase font-semibold text-slate-400">High Risk Anomalies</span>
+                <h3 className="text-2xl font-bold font-display text-rose-400 mt-1">{criticalCount} Active</h3>
+                <p className="text-[11px] text-slate-400 mt-1">Severe expenditure deviation</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
+                <ShieldAlert className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="flex flex-row md:flex-col items-end justify-between md:justify-center gap-3 border-t md:border-t-0 border-slate-800 pt-3 md:pt-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400">Status:</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                  alert.status === 'Resolved'
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : alert.status === 'Under Review'
-                    ? 'bg-amber-500/20 text-amber-300'
-                    : 'bg-rose-500/20 text-rose-400'
-                }`}>
-                  {alert.status}
-                </span>
+            <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs uppercase font-semibold text-slate-400">Medium Risk Surges</span>
+                <h3 className="text-2xl font-bold font-display text-amber-400 mt-1">{warningCount} Active</h3>
+                <p className="text-[11px] text-slate-400 mt-1">Pattern & velocity shifts</p>
               </div>
+              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+            </div>
 
-              <div className="flex items-center gap-2">
-                {alert.status !== 'Resolved' && (
-                  <button
-                    onClick={() => handleStatusChange(alert.id, 'Resolved')}
-                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 transition-colors"
-                  >
-                    Resolve
-                  </button>
-                )}
+            <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-xs uppercase font-semibold text-slate-400">Audited / Investigated</span>
+                <h3 className="text-2xl font-bold font-display text-emerald-400 mt-1">{resolvedCount} Processed</h3>
+                <p className="text-[11px] text-slate-400 mt-1">LangGraph evidence verified</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400 mr-2">Severity:</span>
+              {['All', 'HIGH', 'MEDIUM', 'LOW'].map((sev) => (
                 <button
-                  onClick={() => setActiveModalAlert(alert)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                  key={sev}
+                  onClick={() => setFilterSeverity(sev)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    filterSeverity === sev
+                      ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
                 >
-                  Audit Details
+                  {sev}
                 </button>
-              </div>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400 mr-2">Status:</span>
+              {['All', 'DETECTED', 'INVESTIGATED'].map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setFilterStatus(st)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    filterStatus === st
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  {st}
+                </button>
+              ))}
             </div>
           </div>
-        ))}
 
-        {filteredAlerts.length === 0 && (
-          <div className="glass-panel rounded-3xl p-12 text-center text-slate-500">
-            No anomaly alerts found matching your selected filters.
+          {/* Anomaly Feed Cards */}
+          <div className="space-y-4">
+            {filteredAlerts.map((alert) => {
+              const riskScore = getRiskScore(alert);
+              const isOver = alert.current_value > alert.previous_value;
+              const diffVal = Math.abs(alert.current_value - alert.previous_value);
+
+              return (
+                <div
+                  key={alert.id}
+                  className="glass-panel glass-panel-hover rounded-2xl p-5 border border-slate-800 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                  <div className="space-y-2 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getSeverityBadge(alert.severity)}`}>
+                        {alert.severity} • Score {riskScore}/100
+                      </span>
+                      <span className="text-xs font-mono text-cyan-400 font-semibold">{alert.id.substring(0, 18)}</span>
+                      <span className="text-xs text-slate-400">• {alert.department_name}</span>
+                      <span className="text-[11px] text-slate-500 ml-auto md:ml-0">FY {alert.year}</span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-white font-display">
+                      {alert.scheme_name || `${alert.department_name} Expenditure Shift`}
+                    </h3>
+
+                    {/* What Changed Plain Language */}
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      Spending changed from <strong className="text-white">{formatCr(alert.previous_value)}</strong> to <strong className="text-cyan-400">{formatCr(alert.current_value)}</strong> ({isOver ? '+' : '-'}{formatCr(diffVal)}, {isOver ? '+' : ''}{alert.percentage_change}% shift).
+                    </p>
+
+                    <p className="text-xs text-slate-400 leading-relaxed">{alert.description}</p>
+                  </div>
+
+                  <div className="flex flex-row md:flex-col items-end justify-between md:justify-center gap-3 border-t md:border-t-0 border-slate-800 pt-3 md:pt-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        alert.status === 'INVESTIGATED'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                      }`}>
+                        {alert.status}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleInvestigateAnomaly(alert)}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-cyan-500/20 transition-all hover:scale-105"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>{t('investigate_btn', 'Investigate Spending')}</span>
+                    </button>
+
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredAlerts.length === 0 && (
+              <div className="glass-panel rounded-3xl p-12 text-center text-slate-500">
+                No anomaly risk flags match your selected filters.
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
-      {/* Alert Audit Detail Modal */}
+      {/* Anomaly Investigation Dossier Modal (Phase 2) */}
       {activeModalAlert && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel w-full max-w-xl rounded-3xl p-6 border border-slate-700 bg-slate-900 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+          <div className="glass-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 border border-slate-700 bg-slate-900 shadow-2xl animate-in fade-in zoom-in-95 space-y-4">
+            
+            {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-400" />
-                <span className="font-display font-bold text-lg text-white">AI Anomaly Audit Record</span>
+                <span className="font-display font-bold text-lg text-white">AI Anomaly Investigation Dossier</span>
               </div>
-              <button onClick={() => setActiveModalAlert(null)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => { setActiveModalAlert(null); setActiveInvestigation(null); }} className="p-1 text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-cyan-400">{activeModalAlert.id}</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getSeverityBadge(activeModalAlert.severity)}`}>
-                  {activeModalAlert.severity} • Risk Score: {activeModalAlert.score}/100
+            {/* Section 1: Anomaly Details Header */}
+            <div>
+              <div className="flex items-center gap-2">
+                <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase border ${getSeverityBadge(activeModalAlert.severity)}`}>
+                  {activeModalAlert.severity} SEVERITY
                 </span>
+                <span className="text-slate-500">•</span>
+                <span className="text-xs font-mono text-cyan-400">{activeModalAlert.id}</span>
               </div>
+              <h3 className="text-lg font-bold text-white mt-1">
+                {activeModalAlert.scheme_name || `${activeModalAlert.department_name} Audit Flag`}
+              </h3>
+              <p className="text-xs text-slate-400">Department: {activeModalAlert.department_name} • FY {activeModalAlert.year}</p>
+            </div>
 
-              <h3 className="text-base font-bold text-white">{activeModalAlert.title}</h3>
-              <p className="text-slate-300 leading-relaxed">{activeModalAlert.description}</p>
-
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
-                <span className="font-semibold text-cyan-400">Algorithmic Recommendation:</span>
-                <p className="text-slate-300 leading-relaxed">{activeModalAlert.recommendation}</p>
+            {/* Risk Score Card */}
+            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-semibold text-slate-400">Risk Assessment Score</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-3xl font-extrabold font-display text-rose-400">{getRiskScore(activeModalAlert)}</span>
+                  <span className="text-xs text-slate-400">/ 100 ({activeModalAlert.severity} RISK)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Risk Factors: +{activeModalAlert.percentage_change}% spending shift, baseline anomaly detection.
+                </p>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 text-slate-400 pt-2">
-                <div>Department: <strong className="text-slate-200">{activeModalAlert.department}</strong></div>
-                <div>Detected On: <strong className="text-slate-200">{activeModalAlert.date}</strong></div>
+              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                <ShieldAlert className="w-7 h-7" />
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleStatusChange(activeModalAlert.id, 'Under Review')}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
-                >
-                  Mark Under Review
-                </button>
-                <button
-                  onClick={() => handleStatusChange(activeModalAlert.id, 'Resolved')}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
-                >
-                  Mark Resolved
-                </button>
+            {/* Section 2: WHAT CHANGED? */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-800">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">What Changed?</h4>
+              <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-800 text-xs text-slate-200 leading-relaxed">
+                Spending shifted from <strong>{formatCr(activeModalAlert.previous_value)}</strong> to <strong>{formatCr(activeModalAlert.current_value)}</strong>. That is a net difference of <strong>{formatCr(Math.abs(activeModalAlert.current_value - activeModalAlert.previous_value))}</strong> ({activeModalAlert.percentage_change > 0 ? '+' : ''}{activeModalAlert.percentage_change}% YoY change).
               </div>
+            </div>
 
+            {/* Section 3: WHY IS THIS FLAGGED? */}
+            <div className="space-y-1.5 pt-2 border-t border-slate-800">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">Why Is This Flagged?</h4>
+              <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-800 text-xs text-slate-300 space-y-1">
+                <p><strong>Primary Signal:</strong> {activeModalAlert.anomaly_type || 'SPENDING_SPIKE'}</p>
+                <p><strong>Description:</strong> {activeModalAlert.description}</p>
+              </div>
+            </div>
+
+            {/* Section 4: LANGGRAPH INVESTIGATION & LLM-AS-JUDGE GROUNDING */}
+            <div className="space-y-2 pt-2 border-t border-slate-800">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-cyan-400" /> LangGraph AI Investigation & Grounding Check
+              </h4>
+
+              {isInvestigating ? (
+                <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                  <div className="w-6 h-6 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mx-auto" />
+                  <p className="text-xs text-slate-400">Executing LangGraph 6-node state graph & retrieving documentary evidence...</p>
+                </div>
+              ) : activeInvestigation ? (
+                <div className="space-y-3">
+                  {/* LLM-as-a-Judge Badge */}
+                  <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-semibold ${
+                    activeInvestigation.evidence_strength === 'STRONG' || activeInvestigation.evidence_strength === 'MODERATE'
+                      ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                      : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+                      <span>
+                        {activeInvestigation.evidence_strength === 'STRONG' || activeInvestigation.evidence_strength === 'MODERATE'
+                          ? '✓ GROUNDING CHECK: Supported by retrieved document evidence'
+                          : '⚠ GROUNDING CHECK: Insufficient documentary evidence found in dataset'}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px]">
+                      Confidence: {activeInvestigation.confidence > 0 ? `${(activeInvestigation.confidence * 100).toFixed(0)}%` : 'LOW'}
+                    </span>
+                  </div>
+
+                  {/* AI Explanation */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed space-y-2">
+                    <span className="font-bold text-white block">LangGraph Investigation Summary:</span>
+                    <p>{activeInvestigation.ai_explanation}</p>
+                  </div>
+
+                  {/* Evidence / Source Chunks */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-semibold uppercase text-slate-400">Retrieved Documentary Evidence</span>
+                    {activeInvestigation.source_chunks && activeInvestigation.source_chunks.length > 0 ? (
+                      activeInvestigation.source_chunks.map((src, idx) => (
+                        <div key={idx} className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
+                          <p className="font-mono text-cyan-400 font-semibold">{src}</p>
+                          <div className="flex justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900">
+                            <span>Source: Official government document</span>
+                            <span>AI explanation generated from retrieved evidence</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 space-y-1">
+                        <p className="italic">No specific document citations found matching this anomaly in current dataset.</p>
+                        <div className="flex justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900">
+                          <span>Source: Official government budget database</span>
+                          <span>AI explanation generated from database records</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleInvestigateAnomaly(activeModalAlert)}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-bold text-xs shadow-lg"
+                >
+                  Run Deep LangGraph Investigation
+                </button>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-slate-800 flex justify-end">
               <button
-                onClick={() => setActiveModalAlert(null)}
-                className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300"
+                onClick={() => { setActiveModalAlert(null); setActiveInvestigation(null); }}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
               >
-                Close
+                Close Dossier
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -280,3 +466,4 @@ export default function AIAlerts() {
     </div>
   );
 }
+

@@ -22,6 +22,19 @@ from app.ai.tools import (
 logger = logging.getLogger("civiclens.ai.assistant")
 
 
+MULTILINGUAL_INTENT_A = {
+    "hi": "**{dept}** क्षेत्र का खर्च **+{pct:.1f}%** बढ़ा है (वित्त वर्ष {period_a} में ₹{amt_a} करोड़ से वित्त वर्ष {period_b} में ₹{amt_b} करोड़)। **{doc_title}** के अनुसार: \"{chunk_text}\"",
+    "mr": "**{dept}** विभागाचा खर्च **+{pct:.1f}%** वाढला आहे (वित्त वर्ष {period_a} मधील ₹{amt_a} कोटी वरून वित्त वर्ष {period_b} मधील ₹{amt_b} कोटी). **{doc_title}** नुसार: \"{chunk_text}\"",
+    "bn": "**{dept}** খাতের ব্যয় **+{pct:.1f}%** বৃদ্ধি পেয়েছে (অর্থবছর {period_a}-এ ₹{amt_a} কোটি থেকে অর্থবছর {period_b}-এ ₹{amt_b} কোটি)। **{doc_title}** অনুযায়ী: \"{chunk_text}\"",
+    "ta": "**{dept}** துறைக்கான செலவு **+{pct:.1f}%** அதிகரித்துள்ளது (நிதி ஆண்டு {period_a}-ல் ₹{amt_a} கோடியிலிருந்து நிதி ஆண்டு {period_b}-ல் ₹{amt_b} கோடி). **{doc_title}** இன் படி: \"{chunk_text}\"",
+    "te": "**{dept}** శాఖ వ్యయం **+{pct:.1f}%** పెరిగింది (ఆర్థిక సంవత్సరం {period_a}లో ₹{amt_a} కోట్ల నుండి ఆర్థిక సంవత్సరం {period_b}లో ₹{amt_b} కోట్లకు). **{doc_title}** ప్రకారం: \"{chunk_text}\"",
+    "gu": "**{dept}** વિભાગનો ખર્ચ **+{pct:.1f}%** વધ્યો છે (નાણાકીય વર્ષ {period_a}માં ₹{amt_a} કરોડથી નાણાકીય વર્ષ {period_b}માં ₹{amt_b} કરોડ). **{doc_title}** મુજબ: \"{chunk_text}\"",
+    "kn": "**{dept}** ಇಲಾಖೆಯ ವೆಚ್ಚವು **+{pct:.1f}%** ಹೆಚ್ಚಾಗಿದೆ (ಆರ್ಥಿಕ ವರ್ಷ {period_a} ರಲ್ಲಿ ₹{amt_a} ಕೋಟಿಯಿಂದ ಆರ್ಥಿಕ ವರ್ಷ {period_b} ರಲ್ಲಿ ₹{amt_b} ಕೋಟಿಗೆ). **{doc_title}** ಪ್ರಕಾರ: \"{chunk_text}\"",
+    "ml": "**{dept}** വകുപ്പിലെ ചെലവ് **+{pct:.1f}%** വർദ്ധിച്ചു (സാമ്പത്തിക വർഷം {period_a}-ൽ ₹{amt_a} കോടിയിൽ നിന്ന് സാമ്പത്തിക വർഷം {period_b}-ൽ ₹{amt_b} കോടിയിലേക്ക്). **{doc_title}** പ്രകാരം: \"{chunk_text}\"",
+    "pa": "**{dept}** ਵਿਭਾਗ ਦਾ ਖਰਚਾ **+{pct:.1f}%** ਵਧਿਆ ਹੈ (ਵਿੱਤੀ ਸਾਲ {period_a} ਵਿੱਚ ₹{amt_a} ਕਰੋੜ ਤੋਂ ਵਿੱਤੀ ਸਾਲ {period_b} ਵਿੱਚ ₹{amt_b} ਕਰੋੜ)। **{doc_title}** ਅਨੁਸਾਰ: \"{chunk_text}\"",
+}
+
+
 def process_assistant_question(
     req: AIAssistantRequest,
     db: Optional[Session] = None,
@@ -32,6 +45,7 @@ def process_assistant_question(
     year = req.year or 2026
     period_a = req.period_a or (year - 1 if year else 2025)
     period_b = req.period_b or year
+    lang = (req.language or "en").lower().strip()
 
     m2_adapter = LiveMember2DBAdapter(db=db)
     m3_adapter = LiveMember3DBRAGAdapter(db=db)
@@ -45,6 +59,7 @@ def process_assistant_question(
                 break
         if not dept:
             dept = "Health"  # Default fallback context
+
 
     # =========================================================================
     # INTENT A: "Why did spending increase?" / Cause & Evidence Questions
@@ -103,12 +118,26 @@ def process_assistant_question(
         amt_a = comp_data.get("amount_a", 100.0)
         amt_b = comp_data.get("amount_b", 170.0)
 
-        answer_text = (
-            f"Spending for **{dept}** increased by **+{pct:.1f}%** (from ₹{amt_a} Cr in FY {period_a} "
-            f"to ₹{amt_b} Cr in FY {period_b}). According to **{primary_doc.document_title}**"
-            f"{' (Page ' + str(primary_doc.page_number) + ')' if primary_doc.page_number else ''}: "
-            f"\"{primary_doc.relevant_chunk_text}\""
-        )
+        if lang in MULTILINGUAL_INTENT_A:
+            template = MULTILINGUAL_INTENT_A[lang]
+            answer_text = template.format(
+                dept=dept,
+                pct=pct,
+                period_a=period_a,
+                amt_a=amt_a,
+                period_b=period_b,
+                amt_b=amt_b,
+                doc_title=primary_doc.document_title,
+                chunk_text=primary_doc.relevant_chunk_text
+            )
+        else:
+            answer_text = (
+                f"Spending for **{dept}** increased by **+{pct:.1f}%** (from ₹{amt_a} Cr in FY {period_a} "
+                f"to ₹{amt_b} Cr in FY {period_b}). According to **{primary_doc.document_title}**"
+                f"{' (Page ' + str(primary_doc.page_number) + ')' if primary_doc.page_number else ''}: "
+                f"\"{primary_doc.relevant_chunk_text}\""
+            )
+
 
         return AIAssistantResponse(
             answer=answer_text,

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Bell, Search, Sparkles, Menu, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Eye, Bell, Search, Sparkles, Menu, X, ShieldAlert, CheckCircle2, Globe } from 'lucide-react';
 import { aiAlertsData } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { selectedLang, setSelectedLang, SUPPORTED_LANGUAGES, t } = useLanguage();
 
   const activeAlerts = aiAlertsData.filter(a => a.status === 'Active');
 
@@ -54,7 +56,7 @@ export default function Navbar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search budgets, vendors, departments (e.g. Infrastructure)..."
+                placeholder={t('search_placeholder', "Search budgets, sectors, or departments...")}
                 className="w-full pl-9 pr-4 py-2 text-sm bg-slate-900/90 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
               />
             </div>
@@ -63,13 +65,31 @@ export default function Navbar() {
           {/* Right Action Icons & AI Shortcut */}
           <div className="flex items-center gap-3">
             
+            {/* Global Language Selector */}
+            <div className="flex items-center gap-1.5 glass-panel px-2.5 py-1.5 rounded-xl text-xs text-slate-300 border border-slate-700">
+              <Globe className="w-4 h-4 text-cyan-400" />
+              <select
+                aria-label="Select Application Language"
+                value={selectedLang}
+                onChange={(e) => setSelectedLang(e.target.value)}
+                className="bg-transparent text-white font-bold focus:outline-none cursor-pointer text-xs"
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code} className="bg-slate-900 text-slate-200">
+                    {lang.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <Link
               to="/ai-assistant"
               className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-cyan-500 to-indigo-600 text-white hover:from-cyan-400 hover:to-indigo-500 shadow-md shadow-cyan-500/20 transition-all hover:scale-105"
             >
               <Sparkles className="w-4 h-4 text-cyan-200 animate-pulse" />
-              <span>Ask AI Lens</span>
+              <span>{t('ask_ai', 'Ask AI Assistant')}</span>
             </Link>
+
 
             {/* Notification bell dropdown */}
             <div className="relative">

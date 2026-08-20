@@ -8,6 +8,8 @@ class AIAssistantRequest(BaseModel):
     year: Optional[int] = Field(None, ge=2000, le=2100, description="Optional fiscal year filter")
     period_a: Optional[int] = Field(None, ge=2000, le=2100, description="Optional baseline comparison year")
     period_b: Optional[int] = Field(None, ge=2000, le=2100, description="Optional target comparison year")
+    language: Optional[str] = Field(None, description="Optional target language (e.g. en, hi, mr, bn, ta, te, gu, kn, ml, pa)")
+
 
 
 class EvidenceItem(BaseModel):

@@ -97,3 +97,22 @@ def test_assistant_zero_hallucination_verification(client, db_session):
     assert data["confidence"] == 0.0
     assert data["sources"] == []
     assert "Insufficient evidence" in data["answer"]
+
+
+def test_assistant_multilingual_language_parameter(client, db_session):
+    """Test 7: Multilingual query with target language parameter (e.g. Hindi)."""
+    payload = {
+        "question": "Why did healthcare spending increase in 2026?",
+        "department": "Health",
+        "year": 2026,
+        "language": "hi"
+    }
+    response = client.post("/api/assistant", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "SUPPORTED"
+    assert data["confidence"] >= 0.9
+    assert len(data["evidence"]) >= 1
+    # Verify factual evidence is preserved unchanged
+    assert "Annual Health Infrastructure & Modernization Report 2026" in data["sources"][0]
+
