@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import BudgetExplorer from './pages/BudgetExplorer';
 import AIAssistant from './pages/AIAssistant';
 import AIAlerts from './pages/AIAlerts';
+import RTIGenerator from './pages/RTIGenerator';
 import AdminUpload from './pages/AdminUpload';
 
 export default function App() {
@@ -34,10 +35,12 @@ export default function App() {
             <Route path="/budget-explorer" element={<BudgetExplorer />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/ai-alerts" element={<AIAlerts />} />
+            <Route path="/rti" element={<RTIGenerator />} />
             <Route path="/admin-upload" element={<AdminUpload />} />
           </Routes>
         </main>
       </div>
+
 
       {/* Footer */}
       <Footer />

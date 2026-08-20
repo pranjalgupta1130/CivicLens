@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   ShieldAlert, 
   AlertTriangle, 
@@ -8,6 +8,7 @@ import {
   Filter, 
   ArrowUpRight, 
   FileSearch, 
+  FileText,
   Check, 
   Clock, 
   X,
@@ -22,7 +23,9 @@ import { useLanguage } from '../context/LanguageContext';
 
 export default function AIAlerts() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const selectedAnomalyId = searchParams.get('anomaly');
 
 
@@ -449,6 +452,49 @@ export default function AIAlerts() {
               )}
             </div>
 
+            {/* Section 5: WHAT CAN YOU DO? CITIZEN ACTION SECTION */}
+            <div className="space-y-3 pt-3 border-t border-slate-800">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                What Can You Do?
+              </h4>
+              <p className="text-xs text-slate-400">
+                This spending issue has been investigated using available government records. You can request official documents or submit a citizen concern.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => navigate('/rti', {
+                    state: {
+                      anomalyId: activeModalAlert.id,
+                      department: activeModalAlert.department_name,
+                      scheme: activeModalAlert.scheme_name || 'General Sector Expenditure',
+                      year: activeModalAlert.year,
+                      mode: 'RTI'
+                    }
+                  })}
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 flex items-center justify-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>{t('generate_rti', 'Generate RTI Request')}</span>
+                </button>
+
+                <button
+                  onClick={() => navigate('/rti', {
+                    state: {
+                      anomalyId: activeModalAlert.id,
+                      department: activeModalAlert.department_name,
+                      scheme: activeModalAlert.scheme_name || 'General Sector Expenditure',
+                      year: activeModalAlert.year,
+                      mode: 'CONCERN'
+                    }
+                  })}
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-lg shadow-amber-500/20 transition-all hover:scale-105 flex items-center justify-center gap-2"
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>{t('raise_concern', 'Raise a Concern')}</span>
+                </button>
+              </div>
+            </div>
+
             {/* Modal Footer */}
             <div className="pt-3 border-t border-slate-800 flex justify-end">
               <button
@@ -458,6 +504,7 @@ export default function AIAlerts() {
                 Close Dossier
               </button>
             </div>
+
 
           </div>
         </div>

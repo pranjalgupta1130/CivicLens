@@ -6,6 +6,7 @@ import {
   PieChart, 
   Bot, 
   AlertTriangle, 
+  FileText,
   UploadCloud, 
   ShieldCheck, 
   ChevronRight 
@@ -29,8 +30,10 @@ export default function Sidebar() {
       count: activeAlertsCount, 
       badgeColor: 'bg-rose-500 text-white' 
     },
+    { label: t('nav_rti', 'RTI & Petitions'), path: '/rti', icon: FileText, badge: 'Action' },
     { label: t('nav_admin', 'Admin Upload Portal'), path: '/admin-upload', icon: UploadCloud }
   ];
+
 
 
   return (

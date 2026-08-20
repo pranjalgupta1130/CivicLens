@@ -315,6 +315,14 @@ export default function Dashboard() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+
+              {/* Plain Language Chart Explanation */}
+              <div className="mt-4 p-3 rounded-2xl bg-cyan-950/20 border border-cyan-800/40 text-xs text-slate-300 flex items-start gap-2">
+                <Info className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                <p>
+                  <strong>What this means for citizens:</strong> Total government spending grew from ₹1,000 Cr in FY 2023 to ₹1,340.5 Cr in FY 2026. In FY 2026, actual money spent exceeded approved allocations by ₹30.5 Cr (+2.3%), driven primarily by a 70% increase in health infrastructure outlay.
+                </p>
+              </div>
             </div>
 
             {/* Budget Allocation by Sector Pie Chart */}
@@ -339,15 +347,18 @@ export default function Dashboard() {
                           <Cell key={`cell-${index}`} fill={entry.color} stroke="#0b0f19" strokeWidth={2} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(val) => `₹${val} Cr`} />
+                      <Tooltip formatter={(value) => formatCr(value)} />
                     </PieChart>
                   </ResponsiveContainer>
-
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400">Total Outlay</span>
-                    <span className="font-display font-bold text-white text-base">{formatCr(totalBudget)}</span>
-                  </div>
                 </div>
+              </div>
+
+              {/* Plain Language Pie Chart Explanation */}
+              <div className="mt-4 p-3 rounded-2xl bg-indigo-950/20 border border-indigo-800/40 text-xs text-slate-300 flex items-start gap-2">
+                <Info className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                <p>
+                  <strong>Sector Summary:</strong> Public Works (Roads & Bridges) receives the largest share of public money (₹450 Cr), followed by Public Education (₹350 Cr) and Healthcare (₹170 Cr).
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] pt-4 border-t border-slate-800">
@@ -361,6 +372,7 @@ export default function Dashboard() {
             </div>
 
           </div>
+
 
           {/* Department Breakdown Table */}
           <div className="glass-panel rounded-3xl p-6 border border-slate-800 space-y-4">

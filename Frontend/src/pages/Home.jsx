@@ -68,8 +68,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CivicLens USP Central Product Story Banner */}
+      <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 space-y-6">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            <Sparkles className="w-3.5 h-3.5" />
+            CivicLens Unique Product Story
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+            From Raw Government Budget Data to Real Citizen Action
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-300">
+            Unlike generic analytics dashboards, CivicLens turns complex public ledgers into verified evidence and actionable RTI petitions.
+          </p>
+        </div>
+
+        {/* Product Pipeline Diagram */}
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+          {[
+            { step: '1. Government Data', desc: 'Raw financial ledgers & official reports', color: 'from-cyan-500/20 to-cyan-500/10 text-cyan-400 border-cyan-500/30' },
+            { step: '2. AI Analysis', desc: 'Anomaly detection & spending shifts', color: 'from-indigo-500/20 to-indigo-500/10 text-indigo-400 border-indigo-500/30' },
+            { step: '3. Evidence Grounding', desc: 'Verified against official report chunks', color: 'from-purple-500/20 to-purple-500/10 text-purple-400 border-purple-500/30' },
+            { step: '4. Citizen Wording', desc: 'Plain-language rural explanations', color: 'from-emerald-500/20 to-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+            { step: '5. Citizen Action', desc: 'AI-drafted legal RTI & petitions', color: 'from-amber-500/20 to-amber-500/10 text-amber-400 border-amber-500/30' }
+          ].map((item, idx) => (
+            <div key={idx} className={`p-4 rounded-2xl border bg-gradient-to-b ${item.color} space-y-1.5 flex flex-col justify-between`}>
+              <span className="text-xs font-bold font-display block">{item.step}</span>
+              <p className="text-[11px] text-slate-300 leading-tight">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* KPI Stats Grid - Top Sector Budget Metrics */}
       <section className="space-y-4">
+
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold font-display text-white">Government Sector Allocations FY 2026</h2>
           <span className="text-xs text-slate-400">Synced with CAG Portal</span>
