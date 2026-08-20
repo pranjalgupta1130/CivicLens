@@ -6,8 +6,14 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+from pathlib import Path
+
+# Load environment variables from .env file (robust path resolution)
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+if _env_path.exists():
+    load_dotenv(dotenv_path=_env_path)
+else:
+    load_dotenv()
 
 app = FastAPI(
     title="CivicLens API",

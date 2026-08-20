@@ -9,7 +9,8 @@ async def health_check() -> Dict[str, Any]:
     """
     Returns system status, service health, and active environment.
     """
-    has_gemini_key = bool(os.getenv("GEMINI_API_KEY"))
+    gemini_key = os.getenv("GEMINI_API_KEY", "")
+    has_gemini_key = bool(gemini_key) and not gemini_key.startswith("your_")
     has_supabase = bool(os.getenv("SUPABASE_URL"))
     
     return {
