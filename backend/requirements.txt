@@ -8,3 +8,8 @@ psycopg2-binary>=2.9.9
 python-multipart>=0.0.6
 pytest>=8.0.0
 httpx>=0.26.0
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-google-genai>=2.0.0
+python-dotenv>=1.0.0
+
