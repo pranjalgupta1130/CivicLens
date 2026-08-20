@@ -11,24 +11,27 @@ import {
   ChevronRight 
 } from 'lucide-react';
 import { aiAlertsData } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Sidebar() {
   const activeAlertsCount = aiAlertsData.filter(a => a.status === 'Active').length;
+  const { t } = useLanguage();
 
   const navItems = [
-    { label: 'Home Overview', path: '/', icon: Home },
-    { label: 'Analytics Dashboard', path: '/dashboard', icon: BarChart3 },
-    { label: 'Budget Explorer', path: '/budget-explorer', icon: PieChart },
-    { label: 'AI Assistant', path: '/ai-assistant', icon: Bot, badge: 'Smart' },
+    { label: t('nav_home', 'Home Overview'), path: '/', icon: Home },
+    { label: t('nav_dashboard', 'Civic Financial Dashboard'), path: '/dashboard', icon: BarChart3 },
+    { label: t('nav_explorer', 'Budget Explorer'), path: '/budget-explorer', icon: PieChart },
+    { label: t('nav_assistant', 'Civic AI Assistant'), path: '/ai-assistant', icon: Bot, badge: 'Smart' },
     { 
-      label: 'AI Anomaly Alerts', 
+      label: t('nav_alerts', 'Spending Alerts & Risks'), 
       path: '/ai-alerts', 
       icon: AlertTriangle, 
       count: activeAlertsCount, 
       badgeColor: 'bg-rose-500 text-white' 
     },
-    { label: 'Admin Ingestion', path: '/admin-upload', icon: UploadCloud }
+    { label: t('nav_admin', 'Admin Upload Portal'), path: '/admin-upload', icon: UploadCloud }
   ];
+
 
   return (
     <aside className="hidden lg:flex flex-col w-64 glass-panel border-r border-slate-800/80 min-h-[calc(100vh-4rem)] p-4 space-y-6">

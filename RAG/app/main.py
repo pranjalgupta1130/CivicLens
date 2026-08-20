@@ -1,12 +1,23 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import api_v1_router
+from app.api.v1.health import router as health_router
 import uvicorn
 import os
+from dotenv import load_dotenv
+
+from pathlib import Path
+
+# Load environment variables from .env file (robust path resolution)
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+if _env_path.exists():
+    load_dotenv(dotenv_path=_env_path)
+else:
+    load_dotenv()
 
 app = FastAPI(
     title="CivicLens API",
-    description="Intelligent Government Budget Transparency Platform API running locally.",
+    description="Intelligent Government Budget Transparency Platform API powered by Gemini & Grounded RAG.",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -36,7 +47,7 @@ app.include_router(api_v1_router)
 @app.get("/", status_code=status.HTTP_200_OK, tags=["Root"])
 async def root():
     return {
-        "message": "Welcome to CivicLens API (Offline Mode)",
+        "message": "Welcome to CivicLens API",
         "docs": "/docs",
         "health": "/api/v1/health",
         "version": "1.0.0"

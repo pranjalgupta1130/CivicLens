@@ -52,7 +52,7 @@ app.add_middleware(
 )
 
 # Include API Routers
-from app.routes import health, dashboard, departments, schemes, budgets, anomalies, upload, compare, investigations
+from app.routes import health, dashboard, departments, schemes, budgets, anomalies, upload, compare, investigations, assistant, rti
 
 app.include_router(health.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard.router, prefix=settings.API_V1_STR)
@@ -63,6 +63,10 @@ app.include_router(anomalies.router, prefix=settings.API_V1_STR)
 app.include_router(upload.router, prefix=settings.API_V1_STR)
 app.include_router(compare.router, prefix=settings.API_V1_STR)
 app.include_router(investigations.router, prefix=settings.API_V1_STR)
+app.include_router(assistant.router, prefix=settings.API_V1_STR)
+app.include_router(rti.router, prefix=settings.API_V1_STR)
+
+
 
 @app.get("/")
 def root_redirect():
