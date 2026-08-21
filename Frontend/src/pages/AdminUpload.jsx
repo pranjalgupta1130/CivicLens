@@ -30,17 +30,19 @@ export default function AdminUpload() {
 
   // Ingestion portal state
   const [dragActive, setDragActive] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [category, setCategory] = useState('Upload Budget Files');
   const [parsedData, setParsedData] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
-
-  const sampleCSVContent = `ID,ProjectTitle,Department,Category,Allocated(Cr),Vendor,Status
-GOV-2026-101,PM School Modernization Program,Education,Infrastructure,3240,National School Infra Corp,Approved
-GOV-2026-102,District Hospital Expansion Mission,Healthcare,Medical Works,2850,Arogya Medical Systems,In Progress
-GOV-2026-103,National Highway Development Project,Roads & Highways,Capital Expressways,2100,Bharatiya Highway Developers,Approved
-GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Jal Supply Corp,Under Review`;
+  const [uploadError, setUploadError] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
+  const [apiResponse, setApiResponse] = useState(null);
+  const sampleCSVContent = `department_code,department_name,scheme_code,scheme_name,year,locality,category,budget_amount,actual_amount
+EDU,Department of Education,SCH_MOD,PM School Modernization Program,2026,Statewide,Capital Expenditure,3240,2680
+HLTH,Department of Healthcare,SCH_HOSP,District Hospital Expansion Mission,2026,Pune,Medical Works,2850,2410
+RD,Roads & Highways,SCH_EXPR,National Highway Expressways,2026,Statewide,Infrastructure,2100,1890
+AGRI,Agriculture & Farming,SCH_CROP,Gramin Jal & Farmer Assistance,2026,Nashik,Rural Development,1450,1120`;
 
   const handleSignInSubmit = (e) => {
     e.preventDefault();
@@ -66,14 +68,15 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
     return { headers, rows };
   };
 
-  const [apiResponse, setApiResponse] = useState(null);
-
   const handleFile = async (file) => {
     if (!file) return;
     setSelectedFile(file);
     setIsProcessing(true);
-    setUploadStatus(null);
+    setUploadStatus('uploading');
+    setUploadError(null);
     setApiResponse(null);
+
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -81,11 +84,11 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
       const parsed = parseCSVText(content);
       setParsedData(parsed);
 
-      // Perform real HTTP upload to Backend /api/upload
+      // Perform real HTTP upload to Main Backend on port 8001
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const endpoint = file.name.endsWith('.pdf') ? '/api/upload/pdf' : '/api/upload';
+        const endpoint = file.name.endsWith('.pdf') ? `${API_BASE}/upload/pdf` : `${API_BASE}/upload`;
         const res = await fetch(endpoint, {
           method: 'POST',
           body: formData,
@@ -96,10 +99,28 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
           setApiResponse(data);
           setUploadStatus('success');
         } else {
+          let errorDetail = `Upload failed with status code ${res.status}`;
+          try {
+            const errData = await res.json();
+            if (typeof errData.detail === 'string') {
+              errorDetail = errData.detail;
+            } else if (Array.isArray(errData.detail)) {
+              errorDetail = errData.detail.map(d => d.msg || d.detail || JSON.stringify(d)).join('; ');
+            } else if (errData.message) {
+              errorDetail = errData.message;
+            }
+          } catch (parseErr) {
+            errorDetail = `HTTP ${res.status} ${res.statusText || ''} from ${endpoint}`;
+          }
+          if (res.status === 404) {
+            errorDetail = `Endpoint not found (404) at ${endpoint}. Target server must be main backend on port 8001.`;
+          }
+          setUploadError(errorDetail);
           setUploadStatus('error');
         }
       } catch (err) {
         console.error('File upload error:', err);
+        setUploadError(err.message || 'Network error occurred during file upload.');
         setUploadStatus('error');
       } finally {
         setIsProcessing(false);
@@ -107,19 +128,31 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
     };
 
     if (file.name.endsWith('.pdf')) {
-      // PDF file preview placeholder
       setParsedData({ headers: ['Filename', 'Type', 'Status'], rows: [{ Filename: file.name, Type: 'PDF Document', Status: 'Ready for Vector Indexing' }] });
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch('/api/upload/pdf', { method: 'POST', body: formData });
+        const endpoint = `${API_BASE}/upload/pdf`;
+        const res = await fetch(endpoint, { method: 'POST', body: formData });
         if (res.ok) {
           const data = await res.json();
           setApiResponse(data);
           setUploadStatus('success');
+        } else {
+          let errorDetail = `PDF upload failed with status code ${res.status}`;
+          try {
+            const errData = await res.json();
+            if (typeof errData.detail === 'string') errorDetail = errData.detail;
+          } catch (parseErr) {
+            errorDetail = `HTTP ${res.status} ${res.statusText || ''} from ${endpoint}`;
+          }
+          setUploadError(errorDetail);
+          setUploadStatus('error');
         }
       } catch (err) {
         console.error('PDF upload error:', err);
+        setUploadError(err.message || 'Network error during PDF upload.');
+        setUploadStatus('error');
       } finally {
         setIsProcessing(false);
       }
@@ -129,16 +162,9 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
   };
 
   const handleFillSample = () => {
-    setSelectedFile({ name: 'government_budget_records_2026.csv', size: 1420 });
-    setIsProcessing(true);
-    setUploadStatus(null);
-
-    setTimeout(() => {
-      const parsed = parseCSVText(sampleCSVContent);
-      setParsedData(parsed);
-      setIsProcessing(false);
-      setUploadStatus('success');
-    }, 500);
+    const blob = new Blob([sampleCSVContent], { type: 'text/csv' });
+    const sampleFile = new File([blob], 'government_budget_records_2026.csv', { type: 'text/csv' });
+    handleFile(sampleFile);
   };
 
   const handleDrag = (e) => {
@@ -255,8 +281,15 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
 
         <div className="flex items-center gap-3">
           <button
+            onClick={() => setShowHelp(!showHelp)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-blue-200 dark:border-slate-700 bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 hover:bg-blue-100"
+          >
+            <span>{showHelp ? 'Hide Info' : 'How this works'}</span>
+          </button>
+
+          <button
             onClick={handleFillSample}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-md hover:bg-blue-700 transition-all"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-md hover:bg-blue-700 transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-cyan-200" />
             <span>Load Sample Budget CSV</span>
@@ -264,13 +297,23 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
 
           <button
             onClick={adminLogout}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300"
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
         </div>
       </div>
+
+      {/* Feature Explanation Banner */}
+      {showHelp && (
+        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1">
+          <p className="font-bold text-blue-900 dark:text-cyan-300">💡 How Admin Upload Works:</p>
+          <p>
+            Government administrators can upload raw CSV budget spreadsheets here. The system validates column headers, parses official spending entries, and directly commits them to the database so citizens immediately see updated figures across all dashboards.
+          </p>
+        </div>
+      )}
 
       {/* Upload & Controls Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -281,7 +324,7 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
         }`}>
           <div className="space-y-2">
             <h2 className="text-lg font-bold font-display">Upload Government Budget Records</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Supported format: .csv with headers (ID, ProjectTitle, Department, Allocated, Vendor)</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Supported format: .csv with headers (department, scheme, allocated, spent or official schema)</p>
           </div>
 
           <div
@@ -328,7 +371,7 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
           {isProcessing && (
             <div className="flex items-center justify-center gap-3 py-4 text-xs text-blue-600 dark:text-cyan-400">
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Parsing government ledger rows and validating CSV headers...</span>
+              <span>Uploading and persisting budget records to database...</span>
             </div>
           )}
 
@@ -339,9 +382,19 @@ GOV-2026-104,Rural Water Supply Mission,Water Resources,Water Grid,850,Gramin Ja
                 <p className="font-bold">Dataset Ingested & Published to Database!</p>
                 <p className="text-[11px] opacity-80">
                   {apiResponse
-                    ? `Ingested: ${apiResponse.records_ingested || parsedData?.rows?.length} records | Departments: ${apiResponse.departments_created || 1} | Anomalies Detected: ${apiResponse.anomalies_detected || 0} | RAG Indexed: ${apiResponse.rag_indexed ? 'YES' : 'YES'}`
+                    ? `Ingested: ${apiResponse.records_ingested || parsedData?.rows?.length} records | Departments: ${apiResponse.departments_created || 1} | Anomalies Detected: ${apiResponse.anomalies_detected || 0} | RAG Indexed: ${apiResponse.rag_indexed ? 'YES' : 'NO'}`
                     : `Verified column mapping for ${parsedData?.rows?.length} government ledger rows.`}
                 </p>
+              </div>
+            </div>
+          )}
+
+          {uploadStatus === 'error' && (
+            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 flex items-center gap-3 text-xs text-rose-800 dark:text-rose-300">
+              <div className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">✕</div>
+              <div>
+                <p className="font-bold">CSV Ingestion Failed</p>
+                <p className="text-[11px] opacity-90">{uploadError || 'The uploaded file could not be parsed or saved to the database. Please check column headers and try again.'}</p>
               </div>
             </div>
           )}

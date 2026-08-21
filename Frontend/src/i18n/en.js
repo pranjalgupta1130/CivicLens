@@ -5,8 +5,8 @@ export const en = {
   navHome: "Home",
   navDashboard: "Citizen Dashboard",
   navBudgetExplorer: "Budget Explorer",
-  navAiAssistant: "AI Assistant",
-  navAiAlerts: "AI Alerts",
+  navAiAssistant: "Ask a Question",
+  navAiAlerts: "Spending Alerts",
   navAdminUpload: "Admin Upload",
   searchPlaceholder: "Search budgets, schemes, sectors (e.g. Healthcare)...",
   askVoice: "Ask by Voice",
@@ -17,13 +17,13 @@ export const en = {
 
   // Citizen Dashboard Stats & Hero
   heroTag: "Indian Government Public Budget Transparency Portal",
-  heroTitle: "Public Budget Transparency Made Simple",
-  heroSubtitle: "See how government money is allocated and spent across education, healthcare, roads and other public services.",
+  heroTitle: "See Where Government Money Goes",
+  heroSubtitle: "Easily track how government money is given and spent across education, healthcare, roads, and farming in your area.",
   
-  totalBudget: "Total Budget",
+  totalBudget: "Money Given",
   moneySpent: "Money Spent",
   moneyRemaining: "Money Remaining",
-  budgetUsed: "Budget Used",
+  budgetUsed: "Money Used",
   
   totalBudgetVal: "₹14,290 Cr",
   moneySpentVal: "₹9,840 Cr",
@@ -32,10 +32,11 @@ export const en = {
 
   // Wording replacements
   spentMoreThisYear: "Government spent 39% more this year.",
-  changeFromLastYear: "Change from last year",
-  unusualSpendingFound: "Unusual spending found",
+  changeFromLastYear: "Spending Changed",
+  unusualSpendingFound: "Unusual spending flags",
   governmentSpendingRecords: "Government spending records",
   whyDidThisChange: "Why did this change?",
+  checkThisSpending: "Check This Spending",
 
   // Sector titles
   education: "Education",
@@ -57,11 +58,11 @@ export const en = {
 
   // My Area / My District
   myAreaTitle: "📍 My Area / My District",
-  myAreaSubtitle: "Check local government budget allocations and spending in your district.",
+  myAreaSubtitle: "Check local government money given and spent in your district.",
   selectState: "Select State",
   selectDistrict: "Select District",
   districtBudgetTitle: "District Budget Summary",
-  allocatedMoney: "Money Allocated",
+  allocatedMoney: "Money Given",
   spentMoney: "Money Spent",
   remainingMoney: "Money Remaining",
   unusualAlerts: "Unusual spending flags",
@@ -74,23 +75,23 @@ export const en = {
   moderate: "Moderate",
   highRisk: "High Risk",
 
-  // AI Assistant - Citizen Mode
-  aiTitle: "Citizen AI Assistant",
-  aiSubtitle: "Ask simple questions in English, Hindi, or Marathi about government budgets.",
-  askQuestionPlaceholder: "Type your budget question here or click the mic button...",
+  // Ask a Question - Citizen Mode
+  aiTitle: "Ask a Question",
+  aiSubtitle: "Ask simple questions in English, Hindi, or your local language about government money.",
+  askQuestionPlaceholder: "Type your question here or click the mic button to speak...",
   sampleQuestionsTitle: "Common Citizen Questions",
-  sourceGovtData: "Source: Government Budget Data",
+  sourceGovtData: "Source: Official Government Record",
   whyThisAnswer: "Why this answer?",
   viewBudgetData: "View Budget Data",
 
   // Admin Portal
   adminSignInTitle: "ADMIN SIGN IN",
-  adminSignInSubtitle: "Enter administrative credentials to access data ingestion portal.",
+  adminSignInSubtitle: "Enter administrative credentials to access data upload portal.",
   emailLabel: "Government Email ID",
   passwordLabel: "Password",
   signInBtn: "Sign In as Admin",
-  ingestionPortalTitle: "Admin Data Ingestion Portal",
-  ingestionPortalSubtitle: "Upload CSV dataset, validate columns, and publish to official public ledger.",
+  ingestionPortalTitle: "Admin Data Upload Portal",
+  ingestionPortalSubtitle: "Upload CSV budget records and publish to public ledger.",
 
   // Downloads & Actions
   downloadReport: "Download Budget Report",
@@ -98,5 +99,15 @@ export const en = {
   downloadDistrictData: "Download District Data",
   whyBtn: "Why?",
   closeBtn: "Close",
-  inspectDetails: "Inspect Details"
+  inspectDetails: "Check Details",
+
+  // Feature Explanations (Plain Language "How this works")
+  helpDashboard: "How this works: This page gives a simple overview of all government money given, spent, and remaining for public services.",
+  helpBudgetExplorer: "How this works: Browse detailed sector ledgers line-by-line and compare money spent across different financial years.",
+  helpSpendingAlerts: "How this works: Shows flags whenever government spending suddenly increases or drops compared to normal patterns.",
+  helpAiAssistant: "How this works: Ask any budget question in plain words or voice to get verified answers grounded directly in official government files.",
+  helpInvestigation: "How this works: Inspect the exact official report pages and documentary evidence behind any flagged government expenditure.",
+  helpRtiGenerator: "How this works: Automatically creates a ready-to-file legal Right To Information (RTI) petition with official facts filled in.",
+  helpAdminUpload: "How this works: Government officials can upload new CSV budget files here to immediately update public records."
 };
+

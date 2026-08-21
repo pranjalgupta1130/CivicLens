@@ -16,7 +16,8 @@ import {
   Sparkles,
   Info,
   CheckCircle2,
-  FileCheck
+  FileCheck,
+  HelpCircle
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -50,6 +51,7 @@ export default function RTIGenerator() {
   const [isEditing, setIsEditing] = useState(false);
   const [editableText, setEditableText] = useState('');
   const [trackerStatus, setTrackerStatus] = useState('DRAFT'); // DRAFT, READY_TO_SUBMIT, SUBMITTED, UNDER_REVIEW
+  const [showHelp, setShowHelp] = useState(false);
 
   const fetchRTI = async () => {
     setIsLoading(true);
@@ -125,9 +127,18 @@ export default function RTIGenerator() {
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold font-display text-white">
-                {mode === 'RTI' ? t('nav_rti', 'RTI & Petitions') : t('raise_concern', 'Raise a Concern')}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold font-display text-white">
+                  {mode === 'RTI' ? 'Right To Information (RTI) Petition' : 'Citizen Concern'}
+                </h1>
+                <button
+                  onClick={() => setShowHelp(!showHelp)}
+                  className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-cyan-400 text-xs font-bold hover:bg-slate-700 flex items-center gap-1 cursor-pointer"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span>{showHelp ? 'Hide Info' : 'How this works'}</span>
+                </button>
+              </div>
               <p className="text-xs text-slate-400">
                 Evidence-backed Right to Information draft based on verified public budget records
               </p>
@@ -155,6 +166,15 @@ export default function RTIGenerator() {
           </button>
         </div>
       </div>
+
+      {showHelp && (
+        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1">
+          <p className="font-bold text-blue-900 dark:text-cyan-300">💡 How RTI Generator Works:</p>
+          <p>
+            {t.helpRtiGenerator || "Automatically creates a ready-to-file legal Right To Information (RTI) petition with official facts and document citations filled in."}
+          </p>
+        </div>
+      )}
 
       {/* Demo Status Tracking Stepper */}
       <div className="glass-panel p-5 rounded-3xl border border-slate-800 space-y-3">

@@ -26,7 +26,7 @@ async def upload_budget_csv(file: UploadFile = File(...), db: Session = Depends(
         # Forward CSV file bytes to RAG service for vector indexing
         rag_indexed = False
         try:
-            rag_url = os.getenv("RAG_INGEST_CSV_URL", "http://localhost:8001/api/v1/ingest/csv")
+            rag_url = os.getenv("RAG_INGEST_CSV_URL", "http://localhost:8000/api/v1/ingest/csv")
             async with httpx.AsyncClient(timeout=10.0) as client:
                 rag_resp = await client.post(rag_url, files={"file": (file.filename, content, "text/csv")})
                 if rag_resp.status_code == 200:
@@ -59,7 +59,7 @@ async def upload_budget_pdf(file: UploadFile = File(...), department: str = "Gen
 
     try:
         content = await file.read()
-        rag_url = os.getenv("RAG_INGEST_PDF_URL", "http://localhost:8001/api/v1/ingest/pdf")
+        rag_url = os.getenv("RAG_INGEST_PDF_URL", "http://localhost:8000/api/v1/ingest/pdf")
         params = {"department": department, "year": year}
         async with httpx.AsyncClient(timeout=15.0) as client:
             rag_resp = await client.post(rag_url, params=params, files={"file": (file.filename, content, "application/pdf")})

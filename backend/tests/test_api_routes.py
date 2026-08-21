@@ -48,3 +48,32 @@ def test_upload_csv_endpoint(client):
     res = client.post("/api/upload", files=files)
     assert res.status_code == 201
     assert res.json()["status"] == "success"
+
+
+def test_upload_csv_persistence_and_requery(client):
+    """Verifies that uploaded CSV with friendly column names persists in the database and is reflected in APIs."""
+    friendly_csv = (
+        "department,scheme,allocated,spent,year,locality\n"
+        "Rural Water Supply Mission,Gramin Water Supply,850.0,620.0,2026,Nashik\n"
+    ).encode("utf-8")
+
+    files = {"file": ("rural_water.csv", friendly_csv, "text/csv")}
+    upload_res = client.post("/api/upload", files=files)
+    assert upload_res.status_code == 201
+    data = upload_res.json()
+    assert data["status"] == "success"
+    assert data["records_ingested"] == 1
+
+    # Re-query departments endpoint to verify persistence
+    dept_res = client.get("/api/departments")
+    assert dept_res.status_code == 200
+    depts = dept_res.json()
+    dept_names = [d["name"] for d in depts]
+    assert "Rural Water Supply Mission" in dept_names
+
+    # Re-query dashboard endpoint to verify budget totals updated
+    dash_res = client.get("/api/dashboard")
+    assert dash_res.status_code == 200
+    dash_data = dash_res.json()
+    assert dash_data["total_budget_amount"] >= 850.0
+

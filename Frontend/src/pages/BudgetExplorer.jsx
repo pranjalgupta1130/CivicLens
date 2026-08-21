@@ -26,6 +26,7 @@ export default function BudgetExplorer() {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedBudgetItem, setSelectedBudgetItem] = useState(null);
   const [whyTopic, setWhyTopic] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Live Backend Data States
   const [budgets, setBudgets] = useState([]);
@@ -221,9 +222,18 @@ export default function BudgetExplorer() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-            {t.navBudgetExplorer}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
+              {t.navBudgetExplorer}
+            </h1>
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              className="p-1.5 rounded-xl border border-blue-200 dark:border-slate-700 bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 text-xs font-bold hover:bg-blue-100 flex items-center gap-1 cursor-pointer"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span>{showHelp ? 'Hide Info' : 'How this works'}</span>
+            </button>
+          </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Search public government schemes, contractor projects, and line-item allocations.
           </p>
@@ -231,12 +241,21 @@ export default function BudgetExplorer() {
 
         <button
           onClick={handleExportCSV}
-          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-colors"
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-colors cursor-pointer"
         >
           <Download className="w-4 h-4" />
           <span>{t.downloadSectorData}</span>
         </button>
       </div>
+
+      {showHelp && (
+        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1">
+          <p className="font-bold text-blue-900 dark:text-cyan-300">💡 How Budget Explorer Works:</p>
+          <p>
+            {t.helpBudgetExplorer || "Browse detailed sector ledgers line-by-line and compare money spent across different financial years."}
+          </p>
+        </div>
+      )}
 
       {/* Filter Bar */}
       <div className={`rounded-2xl p-4 border shadow-sm space-y-3 ${

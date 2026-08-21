@@ -37,7 +37,7 @@ export default function WhyExplanationModal({ topicKey, isOpen, onClose, customT
               <h3 className="font-bold text-base font-display">
                 {customTitle || data?.title || t.whyDidThisChange}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Simple Citizen Explanation</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Official Report Evidence & Plain Explanation</p>
             </div>
           </div>
           <button

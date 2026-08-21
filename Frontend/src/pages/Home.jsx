@@ -5,14 +5,16 @@ import {
   ArrowRight, 
   ShieldAlert, 
   Building2, 
-  CheckCircle2, 
-  TrendingUp, 
+  HeartPulse, 
   Route, 
-  Check 
+  Sprout, 
+  Check, 
+  FileText, 
+  HelpCircle,
+  Eye,
+  Send
 } from 'lucide-react';
-import StatCard from '../components/StatCard';
 import MyDistrictSection from '../components/MyDistrictSection';
-import GeographicMap from '../components/GeographicMap';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { aiAlertsData, budgetHighlights } from '../data/mockData';
@@ -23,161 +25,187 @@ export default function Home() {
 
   const activeAlerts = aiAlertsData.filter(a => a.status === 'Active');
 
+  const workflowSteps = [
+    {
+      number: '1',
+      title: 'Government Money',
+      subtitle: 'Money given to public services',
+      icon: Building2,
+      path: '/dashboard',
+      color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800'
+    },
+    {
+      number: '2',
+      title: 'See Where It Goes',
+      subtitle: 'Track spending by sector & district',
+      icon: Eye,
+      path: '/budget-explorer',
+      color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
+    },
+    {
+      number: '3',
+      title: 'Find Unusual Spending',
+      subtitle: 'Automatic flags for price spikes',
+      icon: ShieldAlert,
+      path: '/ai-alerts',
+      color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+    },
+    {
+      number: '4',
+      title: 'Check Evidence',
+      subtitle: 'Inspect official government reports',
+      icon: FileText,
+      path: '/ai-alerts',
+      color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+    },
+    {
+      number: '5',
+      title: 'Take Action',
+      subtitle: 'Create a legal RTI petition in 1 click',
+      icon: Send,
+      path: '/rti-generator',
+      color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+    }
+  ];
+
   return (
     <div className="space-y-10 pb-12">
       
-      {/* Government Portal Light Hero Header */}
-      <section className="rounded-3xl p-8 sm:p-12 border border-slate-200 bg-gradient-to-r from-white via-blue-50 to-emerald-50 text-slate-900 shadow-sm relative overflow-hidden">
+      {/* 1. Welcoming Hero Header with 2 Obvious Primary Actions */}
+      <section className="rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-slate-800 bg-gradient-to-r from-white via-blue-50 to-emerald-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100 shadow-sm relative overflow-hidden">
         <div className="max-w-3xl space-y-6 relative z-10">
           
-          {/* Government Portal Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border bg-white/90 text-blue-900 border-blue-200 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold border bg-white/90 dark:bg-slate-800 text-blue-900 dark:text-cyan-300 border-blue-200 dark:border-slate-700 shadow-xs">
             <span>🇮🇳 {t.heroTag}</span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-slate-900">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
             {t.heroTitle}
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-700 leading-relaxed max-w-2xl font-medium">
+          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed max-w-2xl font-medium">
             {t.heroSubtitle}
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <Link
               to="/dashboard"
-              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center gap-2 transition-all hover:scale-[1.02]"
+              className="px-6 py-4 rounded-2xl text-sm font-extrabold bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center gap-2 transition-all hover:scale-[1.02] cursor-pointer min-h-[48px]"
             >
-              <span>{t.navDashboard}</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Explore Citizen Dashboard</span>
+              <ArrowRight className="w-5 h-5" />
             </Link>
 
             <Link
               to="/ai-assistant"
-              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 shadow-sm flex items-center gap-2 transition-all"
+              className="px-6 py-4 rounded-2xl text-sm font-extrabold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm flex items-center gap-2 transition-all cursor-pointer min-h-[48px]"
             >
-              <Sparkles className="w-4 h-4 text-blue-600" />
-              <span>{t.navAiAssistant}</span>
+              <Sparkles className="w-5 h-5 text-blue-600 dark:text-cyan-400" />
+              <span>Ask a Question</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CivicLens USP Central Product Story Banner */}
-      <section className="glass-panel rounded-3xl p-6 sm:p-8 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 space-y-6">
+      {/* 2. Large Visual 5-Step CivicLens Citizen Workflow */}
+      <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm space-y-6 ${
+        isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+      }`}>
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-            <Sparkles className="w-3.5 h-3.5" />
-            CivicLens Unique Product Story
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-            From Raw Government Budget Data to Real Citizen Action
+          <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-slate-700">
+            5-Step Citizen Workflow
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-display">
+            How CivicLens Works For You
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300">
-            Unlike generic analytics dashboards, CivicLens turns complex public ledgers into verified evidence and actionable RTI petitions.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Follow government money from raw public allocations to verified evidence and legal action.
           </p>
         </div>
 
-        {/* Product Pipeline Diagram */}
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
-          {[
-            { step: '1. Government Data', desc: 'Raw financial ledgers & official reports', color: 'from-cyan-500/20 to-cyan-500/10 text-cyan-400 border-cyan-500/30' },
-            { step: '2. AI Analysis', desc: 'Anomaly detection & spending shifts', color: 'from-indigo-500/20 to-indigo-500/10 text-indigo-400 border-indigo-500/30' },
-            { step: '3. Evidence Grounding', desc: 'Verified against official report chunks', color: 'from-purple-500/20 to-purple-500/10 text-purple-400 border-purple-500/30' },
-            { step: '4. Citizen Wording', desc: 'Plain-language rural explanations', color: 'from-emerald-500/20 to-emerald-500/10 text-emerald-400 border-emerald-500/30' },
-            { step: '5. Citizen Action', desc: 'AI-drafted legal RTI & petitions', color: 'from-amber-500/20 to-amber-500/10 text-amber-400 border-amber-500/30' }
-          ].map((item, idx) => (
-            <div key={idx} className={`p-4 rounded-2xl border bg-gradient-to-b ${item.color} space-y-1.5 flex flex-col justify-between`}>
-              <span className="text-xs font-bold font-display block">{item.step}</span>
-              <p className="text-[11px] text-slate-300 leading-tight">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="space-y-4">
-
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold font-display">{t.heroTag} Summary FY 2026</h2>
-          <span className="text-xs text-slate-500 dark:text-slate-400">CAG Verified Public Record</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <StatCard
-            title={t.totalBudget}
-            value={t.totalBudgetVal}
-            change={t.spentMoreThisYear}
-            changeType="increase"
-            icon={Building2}
-            description="FY 2026 Total Public Allocation"
-            topicKey="Total Budget"
-          />
-          <StatCard
-            title={t.moneySpent}
-            value={t.moneySpentVal}
-            change="69% Used So Far"
-            changeType="increase"
-            icon={CheckCircle2}
-            description="Actual Disbursed Money"
-            topicKey="Money Spent"
-          />
-          <StatCard
-            title={t.moneyRemaining}
-            value={t.moneyRemainingVal}
-            change="31% Available"
-            changeType="decrease"
-            icon={Route}
-            description="Unspent Balance Available"
-            topicKey="Money Remaining"
-          />
-          <StatCard
-            title={t.budgetUsed}
-            value={t.budgetUsedVal}
-            change="+8% vs Last Quarter"
-            changeType="increase"
-            icon={TrendingUp}
-            description="Overall Utilization Percentage"
-            topicKey="Budget Used"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-2">
+          {workflowSteps.map((step) => {
+            const IconComponent = step.icon;
+            return (
+              <Link
+                key={step.number}
+                to={step.path}
+                className={`p-5 rounded-2xl border transition-all hover:scale-[1.03] hover:shadow-md flex flex-col justify-between space-y-4 ${step.color}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center text-xs font-black">
+                    {step.number}
+                  </span>
+                  <IconComponent className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm leading-tight text-slate-900 dark:text-slate-100">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-snug">
+                    {step.subtitle}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-cyan-400">
+                  <span>Open</span>
+                  <ArrowRight className="w-3 h-3" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      {/* 📍 Prominent MY AREA / MY DISTRICT Section */}
+      {/* 3. District / Search Entry */}
       <MyDistrictSection />
 
-      {/* 🟢 Geographic District Risk & Budget Map */}
-      <GeographicMap />
-
-      {/* Budget Highlights */}
-      <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm ${
+      {/* 4. Visual Key Sectors Overview */}
+      <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm space-y-6 ${
         isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
       }`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-2xl bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 border border-blue-200 dark:border-slate-700">
-            <Sparkles className="w-6 h-6" />
-          </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold font-display">FY 2026 Budget Achievements</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Major public infrastructure commitments completed this year</p>
+            <h3 className="text-xl font-bold font-display">Major Public Sectors</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Track key government spending areas in simple terms</p>
           </div>
+          <Link
+            to="/dashboard"
+            className="text-xs font-bold text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+          >
+            <span>View All Financial Data on Dashboard</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgetHighlights.map((highlight, idx) => (
-            <div key={idx} className={`rounded-2xl p-4 border flex items-start gap-3 ${
-              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mt-0.5">
-                <Check className="w-4 h-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { title: t.education, desc: 'School upgrades, digital labs & teacher training', icon: Building2, color: 'text-cyan-500' },
+            { title: t.healthcare, desc: 'District hospital expansion & medical equipment', icon: HeartPulse, color: 'text-rose-500' },
+            { title: t.roads, desc: 'Highway construction & rural connectivity roads', icon: Route, color: 'text-indigo-500' },
+            { title: t.agriculture, desc: 'Water grid, irrigation & farmer welfare schemes', icon: Sprout, color: 'text-emerald-500' }
+          ].map((sec, idx) => {
+            const IconComp = sec.icon;
+            return (
+              <div key={idx} className={`p-5 rounded-2xl border flex flex-col justify-between space-y-3 ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 ${sec.color}`}>
+                    <IconComp className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-sm">{sec.title}</h4>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{sec.desc}</p>
+                <Link to="/dashboard" className="text-[11px] font-bold text-blue-600 dark:text-cyan-400 hover:underline">
+                  Check sector spending ➔
+                </Link>
               </div>
-              <span className="text-xs sm:text-sm font-medium leading-relaxed">
-                {highlight}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* Live Unusual Spending Flags Section */}
+      {/* 5. Live Spending Flags Preview */}
       <section className={`rounded-3xl p-6 sm:p-8 border shadow-sm ${
         isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
       }`}>
@@ -188,12 +216,12 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-bold font-display">{t.unusualSpendingFound}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Public spending flags automatically audited by CivicLens AI</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Public spending flags automatically audited by CivicLens</p>
             </div>
           </div>
           <Link
             to="/ai-alerts"
-            className="text-xs font-bold text-blue-700 dark:text-cyan-400 hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
           >
             <span>View All {activeAlerts.length} Active Flags</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -214,8 +242,8 @@ export default function Home() {
               <h4 className="font-bold text-sm">{alert.title}</h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{alert.description}</p>
               <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-slate-800">
-                <span className="font-semibold text-blue-700 dark:text-cyan-400">{alert.department}</span>
-                <Link to="/ai-alerts" className="text-slate-600 dark:text-slate-300 hover:underline">{t.inspectDetails}</Link>
+                <span className="font-semibold text-blue-600 dark:text-cyan-400">{alert.department}</span>
+                <Link to="/ai-alerts" className="text-slate-600 dark:text-slate-300 hover:underline">{t.checkThisSpending}</Link>
               </div>
             </div>
           ))}
@@ -225,3 +253,4 @@ export default function Home() {
     </div>
   );
 }
+

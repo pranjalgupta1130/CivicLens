@@ -45,6 +45,7 @@ export default function Dashboard() {
   const [searchParams] = useSearchParams();
   const initialQueryFromUrl = searchParams.get('q') || '';
   const [selectedYear, setSelectedYear] = useState('2026');
+  const [showHelp, setShowHelp] = useState(false);
 
   // Live Backend Data States
   const [dashboardData, setDashboardData] = useState(null);
@@ -229,16 +230,32 @@ export default function Dashboard() {
             <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
               {t.navDashboard || "Citizen Financial Dashboard"}
             </h1>
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              className="p-1.5 rounded-xl border border-blue-200 dark:border-slate-700 bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-cyan-400 text-xs font-bold hover:bg-blue-100 flex items-center gap-1 cursor-pointer"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span>{showHelp ? 'Hide Info' : 'How this works'}</span>
+            </button>
             {dashboardData && (
               <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Live Backend API Connected
+                Live Data Connected
               </span>
             )}
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Real-time fiscal monitoring, sector expenditure vs allocation tracking, and CAG ledgers.
+            Track government money given and spent across all public services in simple terms.
           </p>
         </div>
+
+      {showHelp && (
+        <div className="p-4 rounded-2xl bg-blue-50 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1">
+          <p className="font-bold text-blue-900 dark:text-cyan-300">💡 How the Citizen Dashboard Works:</p>
+          <p>
+            {t.helpDashboard || "This page gives a simple overview of all government money given, spent, and remaining for public services. Tap on any sector to see details or ask a question in plain words."}
+          </p>
+        </div>
+      )}
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold border ${
