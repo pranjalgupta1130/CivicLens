@@ -108,6 +108,34 @@ export const en = {
   helpAiAssistant: "How this works: Ask any budget question in plain words or voice to get verified answers grounded directly in official government files.",
   helpInvestigation: "How this works: Inspect the exact official report pages and documentary evidence behind any flagged government expenditure.",
   helpRtiGenerator: "How this works: Automatically creates a ready-to-file legal Right To Information (RTI) petition with official facts filled in.",
-  helpAdminUpload: "How this works: Government officials can upload new CSV budget files here to immediately update public records."
+  helpAdminUpload: "How this works: Government officials can upload new CSV budget files here to immediately update public records.",
+
+  // Landing Page Workflow & Guidance
+  newToCivicLens: "New to CivicLens?",
+  newToCivicLensDesc: "CivicLens helps you track public money in simple language. Pick a sector to see how much was spent, inspect unusual spending flags, or ask questions in your language.",
+  skipGuide: "Skip guide ✕",
+  exploreDashboardBtn: "Explore Citizen Dashboard",
+  askQuestionBtn: "Ask a Question",
+  workflowTag: "5-Step Citizen Workflow",
+  workflowTitle: "How CivicLens Works For You",
+  workflowSubtitle: "Follow government money from raw public allocations to verified evidence and legal action.",
+  wf1Title: "Government Money",
+  wf1Sub: "Money given to public services",
+  wf2Title: "See Where It Goes",
+  wf2Sub: "Track spending by sector & district",
+  wf3Title: "Find Unusual Spending",
+  wf3Sub: "Automatic flags for price spikes",
+  wf4Title: "Check Evidence",
+  wf4Sub: "Inspect official government reports",
+  wf5Title: "Take Action",
+  wf5Sub: "Create a legal RTI petition in 1 click",
+  openBtn: "Open",
+  majorSectorsTitle: "Major Public Sectors",
+  majorSectorsSub: "Track key government spending areas in simple terms",
+  viewAllDashboard: "View All Financial Data on Dashboard",
+  checkSectorSpending: "Check sector spending ➔",
+  viewAllFlags: "View All Active Flags",
+  autoditedFlags: "Public spending flags automatically audited by CivicLens"
 };
+
 

@@ -351,16 +351,36 @@ export default function RTIGenerator() {
             )}
           </div>
 
-          {/* RTI Petition Wording Preview Card */}
-          <div className="glass-panel p-6 rounded-3xl border border-slate-800 bg-slate-950 space-y-6">
+          {/* RTI Petition Wording Preview Card styled as Official Government Letterhead */}
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-xl space-y-6 relative overflow-hidden">
             
-            {/* Header / Notice */}
-            <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-800/50 flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-slate-300 space-y-1">
-                <span className="font-bold text-white block">AI-Generated Legal Wording Notice:</span>
-                <p>
-                  The questions below were formulated neutrally without accusatory language based on verified repository evidence. Review carefully before submission.
+            {/* Watermark / Official Header */}
+            <div className="flex items-center justify-between pb-4 border-b-2 border-slate-300 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white">
+                    FORM A — RIGHT TO INFORMATION PETITION DRAFT
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    Under Section 6(1) of the Right to Information Act, 2005
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono font-extrabold px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-900 border text-slate-600 dark:text-slate-300">
+                OFFICIAL CITIZEN FORM
+              </span>
+            </div>
+
+            {/* AI-Generated Legal Wording Notice */}
+            <div className="p-3.5 rounded-2xl bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800/50 flex items-start gap-3 text-xs">
+              <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div className="text-slate-700 dark:text-slate-300 space-y-0.5">
+                <span className="font-bold text-slate-900 dark:text-white">Formulation Notice:</span>
+                <p className="text-[11px]">
+                  The questions below were formulated neutrally based on verified repository evidence. You can edit the text before printing.
                 </p>
               </div>
             </div>
@@ -382,12 +402,12 @@ export default function RTIGenerator() {
                 className="w-full bg-slate-900 border border-slate-700 rounded-2xl p-4 text-xs font-mono text-slate-200 leading-relaxed focus:outline-none focus:border-cyan-500"
               />
             ) : (
-              <div className="space-y-6 font-sans text-xs text-slate-300 leading-relaxed">
+              <div className="space-y-6 font-sans text-xs text-slate-800 dark:text-slate-300 leading-relaxed">
                 
                 {/* Subject */}
-                <div className="pb-4 border-b border-slate-800">
+                <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Subject of Request</span>
-                  <h2 className="text-base font-bold text-white font-display">
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
                     {rtiData?.subject || `Application under RTI Act 2005 for records regarding ${department} expenditures`}
                   </h2>
                 </div>
@@ -395,13 +415,13 @@ export default function RTIGenerator() {
                 {/* Target Authority */}
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Target Public Authority</span>
-                  <p className="font-semibold text-cyan-300">{rtiData?.public_authority}</p>
+                  <p className="font-bold text-blue-700 dark:text-cyan-300">{rtiData?.public_authority}</p>
                 </div>
 
                 {/* Background Facts */}
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Verified Background & Facts</span>
-                  <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2 text-slate-300">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2 text-slate-700 dark:text-slate-300">
                     {rtiData?.background_facts?.map((fact, idx) => (
                       <p key={idx}>• {fact}</p>
                     ))}
@@ -411,9 +431,9 @@ export default function RTIGenerator() {
                 {/* Information Requested */}
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Specific Information Requested (Section 6(1))</span>
-                  <ol className="list-decimal list-inside space-y-2 p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-slate-200">
+                  <ol className="list-decimal list-inside space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200">
                     {rtiData?.information_requested?.map((item, idx) => (
-                      <li key={idx} className="pl-1"><strong className="text-white">{item}</strong></li>
+                      <li key={idx} className="pl-1"><strong className="text-slate-900 dark:text-white">{item}</strong></li>
                     ))}
                   </ol>
                 </div>
@@ -423,20 +443,32 @@ export default function RTIGenerator() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Certified Records Requested</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {rtiData?.documents_requested?.map((doc, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                        <p className="font-semibold text-white">{doc.record_description}</p>
+                      <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+                        <p className="font-semibold text-slate-900 dark:text-white">{doc.record_description}</p>
                         <p className="text-[10px] text-slate-500">Period: {doc.period_covered}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Raw Petition Box Preview */}
-                <div className="pt-4 border-t border-slate-800">
+                {/* Complete Printable Text Block */}
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-2">Complete Legal Petition Text</span>
-                  <pre className="p-4 rounded-2xl bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300 whitespace-pre-wrap leading-relaxed overflow-x-auto">
+                  <pre className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-mono text-[11px] text-slate-800 dark:text-slate-300 whitespace-pre-wrap leading-relaxed overflow-x-auto">
                     {rtiData?.formatted_rti_text}
                   </pre>
+                </div>
+
+                {/* Clear Citizen Next Steps Box */}
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+                  <p className="font-extrabold flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                    <span>📮 Next Steps to Submit Your Petition:</span>
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 text-[11px] leading-relaxed">
+                    <li>Click <strong>"Download / Print"</strong> above to save your completed petition as PDF or paper copy.</li>
+                    <li>Attach a ₹10 Court Fee Stamp (or Demand Draft / IPO payable to Accounts Officer of the department).</li>
+                    <li>Send via Registered Post / Speed Post to Public Information Officer (PIO) of the target department or upload on state online RTI portal.</li>
+                  </ol>
                 </div>
 
               </div>

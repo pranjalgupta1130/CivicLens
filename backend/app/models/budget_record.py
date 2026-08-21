@@ -14,7 +14,7 @@ class BudgetRecord(Base):
     locality: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True) # Capital Expenditure, Revenue Expenditure, etc.
     budget_amount: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
-    actual_amount: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
+    actual_amount: Mapped[float] = mapped_column(Numeric(15, 2), nullable=True)
     source_document_id: Mapped[str] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

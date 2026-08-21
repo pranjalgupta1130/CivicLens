@@ -285,45 +285,55 @@ export default function AIAlerts() {
 
       {/* Alert Feed Cards */}
       <div className="space-y-4">
-        {filteredAlerts.map((alert) => (
-          <div
-            key={alert.id}
-            className={`rounded-2xl p-5 border shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-              isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
-            }`}
-          >
-            <div className="space-y-2 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
-                  {alert.severity} Flag
-                </span>
-                <span className="text-xs font-mono text-blue-600 dark:text-cyan-400 font-bold">{alert.id}</span>
-                <span className="text-xs text-slate-500">• {alert.department}</span>
-                <span className="text-[11px] text-slate-400 ml-auto md:ml-0">{alert.date}</span>
+        {filteredAlerts.length > 0 ? (
+          filteredAlerts.map((alert) => (
+            <div
+              key={alert.id}
+              className={`rounded-2xl p-5 border shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              }`}
+            >
+              <div className="space-y-2 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                    {alert.severity} Flag
+                  </span>
+                  <span className="text-xs font-mono text-blue-600 dark:text-cyan-400 font-bold">{alert.id}</span>
+                  <span className="text-xs text-slate-500">• {alert.department}</span>
+                  <span className="text-[11px] text-slate-400 ml-auto md:ml-0">{alert.date}</span>
+                </div>
+
+                <h3 className="text-base font-bold font-display">{alert.title}</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">{alert.description}</p>
+                
+                <div className="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <span className="font-bold text-blue-600 dark:text-cyan-400">Citizen Recommendation:</span>
+                  <span className="text-slate-600 dark:text-slate-300">{alert.recommendation}</span>
+                </div>
               </div>
 
-              <h3 className="text-base font-bold font-display">{alert.title}</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">{alert.description}</p>
-              
-              <div className="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                <span className="font-bold text-blue-600 dark:text-cyan-400">Citizen Recommendation:</span>
-                <span className="text-slate-600 dark:text-slate-300">{alert.recommendation}</span>
+              <div className="flex flex-row md:flex-col items-end justify-between md:justify-center gap-3 border-t md:border-t-0 border-slate-200 dark:border-slate-800 pt-3 md:pt-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-400">Status:</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                    {alert.status}
+                  </span>
+                </div>
+                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
               </div>
             </div>
-
-            <div className="flex flex-row md:flex-col items-end justify-between md:justify-center gap-3 border-t md:border-t-0 border-slate-200 dark:border-slate-800 pt-3 md:pt-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400">Status:</span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                  {alert.status}
-                </span>
-              </div>
-              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-            </div>
+          ))
+        ) : (
+          <div className="rounded-3xl p-8 border border-dashed border-slate-300 dark:border-slate-800 text-center space-y-3 bg-white dark:bg-slate-900">
+            <ShieldCheck className="w-10 h-10 text-emerald-500 mx-auto" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Anomaly Flags Detected For This Dataset</h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              The deterministic anomaly detection engine compares multi-year spending baselines and spending vs allocation variances. For single-year Budget Estimates, anomaly flags are not generated automatically.
+            </p>
           </div>
-        ))}
+        )}
       </div>
 
           {/* Alert Modal */}

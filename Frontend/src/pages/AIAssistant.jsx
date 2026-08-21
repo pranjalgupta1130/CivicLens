@@ -32,19 +32,19 @@ export default function AIAssistant() {
   const initialUrlQuery = searchParams.get('q') || '';
 
   const sampleCitizenPrompts = [
-    "How much money was given to education?",
-    "Why did healthcare spending increase?",
-    "Which sector got the most money?",
-    "How much was spent on roads?",
-    "Show me Maharashtra's budget."
+    t.chartEducation5Years || "How much money was given to education?",
+    t.whyDidThisChange || "Why did healthcare spending increase?",
+    t.chartWhichSectorMost || "Which sector received the most funding?",
+    t.chartHowMuchSpentSoFar || "How much was spent on roads?",
+    t.myAreaTitle || "Show me my district's budget."
   ];
 
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
       sender: 'ai',
-      text: "Hello citizen! I am your CivicLens Multilingual AI Assistant. Select your language or speak via microphone to query public budget ledgers.",
-      sources: ["CAG Open Budget Portal", "Ministry Ledgers"],
+      text: t.aiSubtitle || "Hello citizen! Ask any question about government money in plain words or voice to get answers grounded directly in official government files.",
+      sources: ["Comptroller and Auditor General (CAG) Portal", "Official State Ledger"],
       topicKey: "default",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }

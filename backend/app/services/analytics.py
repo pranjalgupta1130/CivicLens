@@ -43,8 +43,8 @@ def get_dashboard_summary(db: Session) -> DashboardSummary:
         top_spenders.append(TopSpenderItem(
             department_id=dept_id,
             department_name=dept_name,
-            total_budget=float(b_amt),
-            total_actual=float(a_amt),
+            total_budget=float(b_amt or 0.0),
+            total_actual=float(a_amt or 0.0),
             yoy_change_percentage=yoy
         ))
 
@@ -56,7 +56,7 @@ def get_dashboard_summary(db: Session) -> DashboardSummary:
     ).group_by(BudgetRecord.year).order_by(BudgetRecord.year).all()
 
     yearly_trends = [
-        YearlyTrendItem(year=y, total_budget=float(b), total_actual=float(a))
+        YearlyTrendItem(year=y, total_budget=float(b or 0.0), total_actual=float(a or 0.0))
         for y, b, a in yearly_query
     ]
 

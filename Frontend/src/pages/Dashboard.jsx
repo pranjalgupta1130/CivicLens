@@ -63,12 +63,12 @@ export default function Dashboard() {
   const [activeAnswer, setActiveAnswer] = useState(null);
   const [isAnswering, setIsAnswering] = useState(false);
 
-  const [deptList, setDeptList] = useState(departmentBudgets);
+  const [deptList, setDeptList] = useState([]);
   const [kpiStats, setKpiStats] = useState({
-    totalBudget: t.totalBudgetVal || "₹14,290 Cr",
-    spentAmount: t.moneySpentVal || "₹9,840 Cr",
-    moneyRemaining: t.moneyRemainingVal || "₹4,450 Cr",
-    budgetUsed: t.budgetUsedVal || "69%"
+    totalBudget: "₹0 Cr",
+    spentAmount: "₹0 Cr",
+    moneyRemaining: "₹0 Cr",
+    budgetUsed: "0%"
   });
 
   const citizenQuickQuestions = [
@@ -479,26 +479,35 @@ export default function Dashboard() {
           </div>
 
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlySpendingData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorSpent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f293d" : "#e2e8f0"} vertical={false} />
-                <XAxis dataKey="month" stroke={isDark ? "#64748b" : "#64748b"} fontSize={11} tickLine={false} />
-                <YAxis stroke={isDark ? "#64748b" : "#64748b"} fontSize={11} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="spent" name="Spent" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorSpent)" />
-                <Area type="monotone" dataKey="budget" name="Target" stroke="#6366f1" strokeWidth={2} strokeDasharray="4 4" fillOpacity={1} fill="url(#colorBudget)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {dashboardData?.total_actual_amount > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={monthlySpendingData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorSpent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f293d" : "#e2e8f0"} vertical={false} />
+                  <XAxis dataKey="month" stroke={isDark ? "#64748b" : "#64748b"} fontSize={11} tickLine={false} />
+                  <YAxis stroke={isDark ? "#64748b" : "#64748b"} fontSize={11} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="spent" name="Spent" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorSpent)" />
+                  <Area type="monotone" dataKey="budget" name="Target" stroke="#6366f1" strokeWidth={2} strokeDasharray="4 4" fillOpacity={1} fill="url(#colorBudget)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center space-y-2">
+                <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">Monthly & Actual Spending Data Unavailable</p>
+                <p className="text-xs text-slate-500 max-w-md">
+                  The uploaded document provides 2026–27 Budget Estimates (Revenue & Capital allocations) but does not contain monthly disbursement logs.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -537,7 +546,7 @@ export default function Dashboard() {
 
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
                 <span className="text-[10px] uppercase font-semibold text-slate-400">Total Outlay</span>
-                <span className="font-display font-bold text-base">₹14,290 Cr</span>
+                <span className="font-display font-bold text-base">{kpiStats.totalBudget}</span>
               </div>
             </div>
           </div>
@@ -571,18 +580,27 @@ export default function Dashboard() {
         </div>
 
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={yearTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f293d" : "#e2e8f0"} vertical={false} />
-              <XAxis dataKey="year" stroke="#64748b" fontSize={11} tickLine={false} />
-              <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
-              <Tooltip formatter={(val) => `₹${val} Cr`} />
-              <Bar dataKey="Education" fill="#6366f1" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Healthcare" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Roads" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Agriculture" fill="#10b981" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {dashboardData?.yearly_trend && dashboardData.yearly_trend.length > 1 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={yearTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f293d" : "#e2e8f0"} vertical={false} />
+                <XAxis dataKey="year" stroke="#64748b" fontSize={11} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                <Tooltip formatter={(val) => `₹${val} Cr`} />
+                <Bar dataKey="Education" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Healthcare" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Roads" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Agriculture" fill="#10b981" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center space-y-2">
+              <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">Historical Multi-Year Comparison Unavailable</p>
+              <p className="text-xs text-slate-500 max-w-md">
+                This uploaded document contains single-year Budget Estimates for FY 2026–27. Multi-year comparison requires uploading multi-year historical ledgers.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -595,7 +613,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-bold font-display">{t.governmentSpendingRecords || "Government Spending Records"}</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">Simple citizen comparison of allocated money versus actual money spent</p>
           </div>
-          <span className="text-xs text-slate-400 font-mono">8 Sectors Listed</span>
+          <span className="text-xs text-slate-400 font-mono">{deptList.length} Sectors Listed</span>
         </div>
 
         <div className="overflow-x-auto">

@@ -230,3 +230,42 @@ def test_e2e_error_handling_and_validation(client, db_session):
     # Malformed empty payload in assistant
     ast_res = client.post("/api/assistant", json={})
     assert ast_res.status_code == 422
+
+
+# =============================================================================
+# DYNAMIC DATA & CSV A VS B ANALYTICS REGRESSION TESTS
+# =============================================================================
+
+def test_dynamic_csv_upload_and_analytics_diff(client, db_session):
+    """Verify Upload CSV A -> DB & API update -> Upload CSV B -> DB & API update differ."""
+    # CSV A
+    csv_a = (
+        "department_code,department_name,scheme_code,scheme_name,year,locality,category,budget_amount,actual_amount\n"
+        "AAA,Alpha Rural Department,A001,Alpha Water Project,2026,Alpha District,Water,1000,400\n"
+    )
+    res_a = client.post("/api/upload", files={"file": ("csv_a.csv", csv_a.encode("utf-8"), "text/csv")})
+    assert res_a.status_code == 201
+
+    dash_a = client.get("/api/dashboard").json()
+    depts_a = client.get("/api/departments").json()
+    budgets_a = client.get("/api/budgets").json()
+
+    assert any(d["code"] == "AAA" for d in depts_a)
+    assert any(b["department_name"] == "Alpha Rural Department" for b in budgets_a)
+
+    # CSV B with radically different values
+    csv_b = (
+        "department_code,department_name,scheme_code,scheme_name,year,locality,category,budget_amount,actual_amount\n"
+        "BBB,Beta Agriculture Department,B001,Beta Irrigation Project,2026,Beta District,Agriculture,8000,7200\n"
+    )
+    res_b = client.post("/api/upload", files={"file": ("csv_b.csv", csv_b.encode("utf-8"), "text/csv")})
+    assert res_b.status_code == 201
+
+    dash_b = client.get("/api/dashboard").json()
+    depts_b = client.get("/api/departments").json()
+
+    # Dashboard totals must change
+    assert dash_b["total_budget_amount"] > dash_a["total_budget_amount"]
+    assert dash_b["total_actual_amount"] > dash_a["total_actual_amount"]
+    assert any(d["code"] == "BBB" for d in depts_b)
+
